@@ -1,0 +1,11 @@
+
+body {
+  padding-top: 5em;
+  background: Cornsilk;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+.button {
+  cursor: pointer;
+}
