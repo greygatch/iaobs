@@ -42,6 +42,7 @@ function stopUsingBrowserStack() {
 }
 
 function updateActiveStatus(bool) {
+
   dbRef.set({
     isActive: bool
   }, (error) => {
