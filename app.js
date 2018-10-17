@@ -8,7 +8,7 @@ var config = {
 };
 
 firebase.initializeApp(config);
-const dbRef = firebase.database().ref();
+const dbRef = firebase.database().ref('/');
 const activeDiv = document.getElementById('active-status');
 const useButton = document.getElementById('use-button');
 const stopButton = document.getElementById('stop-button');
@@ -16,7 +16,13 @@ const stopButton = document.getElementById('stop-button');
 useButton.addEventListener('click', beginUsingBrowserStack);
 stopButton.addEventListener('click', stopUsingBrowserStack);
 
-init();
+document.onreadystatechange = function () {
+  if (document.readyState === "complete") {
+    init();
+  }
+}
+
+
 
 function init() {
   dbRef.on('value', snap => {
@@ -42,7 +48,6 @@ function stopUsingBrowserStack() {
 }
 
 function updateActiveStatus(bool) {
-
   dbRef.set({
     isActive: bool
   }, (error) => {
