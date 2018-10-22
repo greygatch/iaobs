@@ -21,14 +21,14 @@ init();
 
 function init() {
   dbRef.on('value', snap => {
-     const isActive = snap.val().isActive;
-     const userName = snap.val().userName;
+     const isActive = snap.val().isActive,
+           userName = snap.val().userName;
      if (isActive) {
        activeDiv.innerHTML = `Yes ${userName} is busy with it!`;
        useButton.disabled = true;
        stopButton.disabled = false;
-     } else {
-       activeDiv.innerHTML = 'No';
+     } else {  
+       activeDiv.innerHTML = 'Nope';
        useButton.disabled = false;
        stopButton.disabled = true;
      }
@@ -36,8 +36,12 @@ function init() {
 }
 
 function beginUsingBrowserStack() {
-  updateActiveStatus(true, userNameInput.value);
-  userNameInput.value = '';
+  if (userNameInput.value === '') {
+    activeDiv.innerHTML = `Please enter a username!`;
+  } else {
+    updateActiveStatus(true, userNameInput.value);
+    userNameInput.value = '';
+  }
 }
 
 function stopUsingBrowserStack() {
