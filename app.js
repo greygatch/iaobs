@@ -8,10 +8,11 @@ var config = {
 };
 
 firebase.initializeApp(config);
-const dbRef = firebase.database().ref();
-const activeDiv = document.getElementById('active-status');
-const useButton = document.getElementById('use-button');
-const stopButton = document.getElementById('stop-button');
+const dbRef = firebase.database().ref(),
+      activeDiv = document.getElementById('active-status'),
+      useButton = document.getElementById('use-button'),
+      stopButton = document.getElementById('stop-button'),
+      userNameInput = document.getElementById('user-name');
 
 useButton.addEventListener('click', beginUsingBrowserStack);
 stopButton.addEventListener('click', stopUsingBrowserStack);
@@ -20,13 +21,14 @@ init();
 
 function init() {
   dbRef.on('value', snap => {
-     const isActive = snap.val().isActive;
+     const isActive = snap.val().isActive,
+           userName = snap.val().userName;
      if (isActive) {
-       activeDiv.innerHTML = 'Yes';
+       activeDiv.innerHTML = `Yes ${userName} is busy with it!`;
        useButton.disabled = true;
        stopButton.disabled = false;
-     } else {
-       activeDiv.innerHTML = 'No';
+     } else {  
+       activeDiv.innerHTML = 'Nope';
        useButton.disabled = false;
        stopButton.disabled = true;
      }
@@ -34,15 +36,22 @@ function init() {
 }
 
 function beginUsingBrowserStack() {
-  updateActiveStatus(true);
+  if (userNameInput.value === '') {
+    activeDiv.innerHTML = `Please enter a username!`;
+  } else {
+    updateActiveStatus(true, userNameInput.value);
+    userNameInput.value = '';
+  }
 }
 
 function stopUsingBrowserStack() {
-  updateActiveStatus(false);
+  userNameInput.value = '';
+  updateActiveStatus(false, '');
 }
 
-function updateActiveStatus(bool) {
+function updateActiveStatus(bool, string) {
   dbRef.set({
+    userName: string,
     isActive: bool
   }, (error) => {
     if (error) {
