@@ -1,10 +1,10 @@
 var config = {
-  apiKey: "AIzaSyCpQx9uI62YWpkoMsnBd3JIo857uDt0OYk",
-  authDomain: "testtest123-6376c.firebaseapp.com",
-  databaseURL: "https://testtest123-6376c.firebaseio.com",
-  projectId: "testtest123-6376c",
-  storageBucket: "testtest123-6376c.appspot.com",
-  messagingSenderId: "505046414181"
+  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
+  authDomain: "iaobs-3941b.firebaseapp.com",
+  databaseURL: "https://iaobs-3941b.firebaseio.com",
+  projectId: "iaobs-3941b",
+  storageBucket: "iaobs-3941b.appspot.com",
+  messagingSenderId: "981123119987"
 };
 
 firebase.initializeApp(config);
