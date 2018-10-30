@@ -72,7 +72,6 @@ function setTime() {
   const start = 'For&nbsp;';
   const stringSeconds = '&nbsp;seconds';
   let stringMinutes = '';
-  let stringHour ='';
   let stringHours ='';
 
   if (isActive) {
@@ -95,11 +94,16 @@ function setTime() {
       hours = Math.floor(time/3600);
       stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
       stringHours ='&nbsp;hour&nbsp;and&nbsp;'
-    } else if (time > 60) {
+    } else if (time > 120) {
       seconds = (time % 60);
       minutes = Math.floor(time/60);
       hours = '';
       stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
+     } else if (time > 60) {
+      seconds = (time % 60);
+      minutes = Math.floor(time/60);
+      hours = '';
+      stringMinutes = '&nbsp;minute&nbsp;and&nbsp;';
     } else {
       seconds = time;
       minutes = '';
@@ -107,7 +111,6 @@ function setTime() {
     }
   }
 }
-
 
 function stopUsingBrowserStack() {
   userNameInput.value = '';
