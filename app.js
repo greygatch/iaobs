@@ -1,14 +1,15 @@
-var config = {
-  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
-  authDomain: "iaobs-3941b.firebaseapp.com",
-  databaseURL: "https://iaobs-3941b.firebaseio.com",
-  projectId: "iaobs-3941b",
-  storageBucket: "iaobs-3941b.appspot.com",
-  messagingSenderId: "981123119987"
+const config = {
+  apiKey: "AIzaSyCpQx9uI62YWpkoMsnBd3JIo857uDt0OYk",
+  authDomain: "testtest123-6376c.firebaseapp.com",
+  databaseURL: "https://testtest123-6376c.firebaseio.com",
+  projectId: "testtest123-6376c",
+  storageBucket: "testtest123-6376c.appspot.com",
+  messagingSenderId: "505046414181"
 };
 
 firebase.initializeApp(config);
-const dbRef = firebase.database().ref();
+
+const db = firebase.database();
 const activeDiv = document.getElementById('active-status');
 const activeTimer = document.getElementById('active-timer');
 const useButton = document.getElementById('use-button');
@@ -17,31 +18,35 @@ const userNameInput = document.getElementById('user-name');
 
 let isActive;
 let timerStartValue;
+let activeUser;
 let timerIsActive = false;
 
 useButton.addEventListener('click', beginUsingBrowserStack);
 stopButton.addEventListener('click', stopUsingBrowserStack);
 
-document.onreadystatechange = function () {
-  if (document.readyState === "complete") {
+document.onreadystatechange = () => {
+  if (document.readyState === 'complete') {
     init();
   }
 }
 
 function init() {
-  dbRef.on('value', snap => {
+  db.ref('isActive').on('value', snap => {
      isActive = snap.val().isActive;
      const userName = snap.val().userName;
      const startTime = snap.val().startTime;
      if (isActive) {
-       activeDiv.innerHTML = `Yes ${userName} has been using it!`;
+       activeUser = userName;
+       activeDiv.innerHTML = `Yep! ${userName} has reserved it!`;
        useButton.disabled = true;
        stopButton.disabled = false;
+       userNameInput.disabled = true;
        startTimer(startTime);
      } else {
        activeDiv.innerHTML = 'Nope';
        useButton.disabled = false;
        stopButton.disabled = true;
+       userNameInput.disabled = false;
      }
   });
 }
@@ -51,9 +56,16 @@ function beginUsingBrowserStack() {
   if (userNameInput.value === '') {
     activeDiv.innerHTML = `Please enter a username!`;
   } else {
-    updateFirebase(true, userNameInput.value, startTime);
+    updateFirebaseIsActive(true, userNameInput.value, startTime);
     userNameInput.value = '';
   }
+}
+
+function stopUsingBrowserStack() {
+  const formmatedString = activeTimer.innerHTML.replace(/&nbsp;/g, ' ');
+  updateFirebaseLogs(activeUser, formmatedString);
+  activeTimer.innerHTML = '';
+  updateFirebaseIsActive(false, '', 0);
 }
 
 function startTimer(startNumber) {
@@ -65,61 +77,55 @@ function startTimer(startNumber) {
 }
 
 function setTime() {
-  let seconds;
-  let minutes;
-  let hours;
-
-  const start = 'For&nbsp;';
-  const stringSeconds = '&nbsp;seconds';
-  let stringMinutes = '';
-  let stringHours ='';
-
   if (isActive) {
     timerIsActive = true;
     ++timerStartValue;
-    formatTime(timerStartValue);
-    activeTimer.innerHTML = start + hours + stringHours + minutes + stringMinutes + seconds + stringSeconds;
-  }
-
-  function formatTime(time) { 
-    if (time > 7200) {
-      seconds = time % 60;
-      minutes = Math.floor((time % 3600)/60);
-      hours = Math.floor(time/3600);
-      stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
-      stringHours ='&nbsp;hours&nbsp;and&nbsp;'
-    } else if (time > 3600) {
-      seconds = time % 60;
-      minutes = Math.floor((time % 3600)/60);
-      hours = Math.floor(time/3600);
-      stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
-      stringHours ='&nbsp;hour&nbsp;and&nbsp;'
-    } else if (time > 120) {
-      seconds = (time % 60);
-      minutes = Math.floor(time/60);
-      hours = '';
-      stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
-     } else if (time > 60) {
-      seconds = (time % 60);
-      minutes = Math.floor(time/60);
-      hours = '';
-      stringMinutes = '&nbsp;minute&nbsp;and&nbsp;';
-    } else {
-      seconds = time;
-      minutes = '';
-      hours = '';
-    }
+    activeTimer.innerHTML = formatTime(timerStartValue)
   }
 }
 
-function stopUsingBrowserStack() {
-  userNameInput.value = '';
-  activeTimer.innerHTML = '';
-  updateFirebase(false, '', 0);
+function formatTime(time) {
+  let seconds;
+  let hours;
+  let minutes;
+  let stringMinutes = '';
+  let stringHours = '';
+
+  const stringStart = 'For&nbsp;';
+  const stringSeconds = '&nbsp;seconds';
+
+  if (time > 7200) {
+    seconds = time % 60;
+    minutes = Math.floor((time % 3600)/60);
+    hours = Math.floor(time/3600);
+    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
+    stringHours ='&nbsp;hours&nbsp;and&nbsp;'
+  } else if (time > 3600) {
+    seconds = time % 60;
+    minutes = Math.floor((time % 3600)/60);
+    hours = Math.floor(time/3600);
+    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
+    stringHours ='&nbsp;hour&nbsp;and&nbsp;'
+  } else if (time > 120) {
+    seconds = (time % 60);
+    minutes = Math.floor(time/60);
+    hours = '';
+    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
+   } else if (time > 60) {
+    seconds = (time % 60);
+    minutes = Math.floor(time/60);
+    hours = '';
+    stringMinutes = '&nbsp;minute&nbsp;and&nbsp;';
+  } else {
+    seconds = time;
+    minutes = '';
+    hours = '';
+  }
+  return stringStart + hours + stringHours + minutes + stringMinutes + seconds + stringSeconds;
 }
 
-function updateFirebase(bool, string, number) {
-  dbRef.set({
+function updateFirebaseIsActive(bool, string, number) {
+  db.ref('isActive').set({
     userName: string,
     isActive: bool,
     startTime: number
@@ -130,4 +136,37 @@ function updateFirebase(bool, string, number) {
       console.log('success updating isActive');
     }
   });
+}
+
+function updateFirebaseLogs(userName, timerString) {
+  const logTime = Date.now();
+  const dateToday = getCurrentDate();
+
+  db.ref(`logs/${dateToday}/${userName}-${timerString}`).set({
+    user: userName,
+    timeUsed: timerString,
+    logRecoredTime: logTime
+  }, (error) => {
+    if (error) {
+      console.log('error writing to FB');
+    } else {
+      console.log('success updating logs');
+    }
+  });
+}
+
+function getCurrentDate() {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth()+1;
+  const year = date.getFullYear();
+
+  if (day < 10) {
+    day = `0${day}`;
+  }
+  if (month < 10) {
+    month = `0${month}`;
+  }
+
+  return `${day}-${month}-${year}`;
 }

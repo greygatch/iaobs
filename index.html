@@ -10,10 +10,12 @@
 <body>
   <h2>Is Anyone On BrowserStack?</h2>
   <h3 id='active-status'>Loading...</h3>
-  <input class='text' id='user-name' placeholder='Enter your name here'>
-  <input class='button' id='use-button' disabled=true value="Use BrowserStack">
-  <input class='button' id='stop-button' disabled=true value="Stop Using BS">
-  <h4 class='text' id='active-timer' disabled=true value=""></h4>
+  <input class='text' id='user-name' placeholder='Enter your name here' disabled=true>
+  <div class='actionBar'>
+    <button class='button' id='use-button' disabled=true>Use BrowserStack</button>
+    <button class='button' id='stop-button' disabled=true>Stop Use</button>
+  </div>
+  <h4 class='text' id='active-timer'></h4>
   <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase.js"></script>
   <script type="text/javascript" src="app.js"></script>
 </body>
