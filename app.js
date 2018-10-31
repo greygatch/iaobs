@@ -1,10 +1,10 @@
 const config = {
-  apiKey: "AIzaSyCpQx9uI62YWpkoMsnBd3JIo857uDt0OYk",
-  authDomain: "testtest123-6376c.firebaseapp.com",
-  databaseURL: "https://testtest123-6376c.firebaseio.com",
-  projectId: "testtest123-6376c",
-  storageBucket: "testtest123-6376c.appspot.com",
-  messagingSenderId: "505046414181"
+  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
+  authDomain: "iaobs-3941b.firebaseapp.com",
+  databaseURL: "https://iaobs-3941b.firebaseio.com",
+  projectId: "iaobs-3941b",
+  storageBucket: "iaobs-3941b.appspot.com",
+  messagingSenderId: "981123119987"
 };
 
 firebase.initializeApp(config);
@@ -17,12 +17,19 @@ const stopButton = document.getElementById('stop-button');
 const userNameInput = document.getElementById('user-name');
 
 let isActive;
+let userName;
+let startTime;
 let timerStartValue;
 let activeUser;
 let timerIsActive = false;
 
-useButton.addEventListener('click', beginUsingBrowserStack);
 stopButton.addEventListener('click', stopUsingBrowserStack);
+useButton.addEventListener('click', beginUsingBrowserStack);
+userNameInput.addEventListener('keyup', (event) => {
+  if (event.keyCode === 13) {
+    beginUsingBrowserStack();
+  }
+});
 
 document.onreadystatechange = () => {
   if (document.readyState === 'complete') {
@@ -32,129 +39,112 @@ document.onreadystatechange = () => {
 
 function init() {
   db.ref('isActive').on('value', snap => {
-     isActive = snap.val().isActive;
-     const userName = snap.val().userName;
-     const startTime = snap.val().startTime;
-     if (isActive) {
-       activeUser = userName;
-       activeDiv.innerHTML = `Yep! ${userName} has reserved it!`;
-       useButton.disabled = true;
-       stopButton.disabled = false;
-       userNameInput.disabled = true;
-       startTimer(startTime);
-     } else {
-       activeDiv.innerHTML = 'Nope';
-       useButton.disabled = false;
-       stopButton.disabled = true;
-       userNameInput.disabled = false;
-     }
+    isActive = snap.val().isActive;
+    userName = snap.val().userName;
+    startTime = snap.val().startTime;
+    if (isActive) {
+      setActive();
+    } else {
+      setInActive();
+    }
   });
 }
 
+/* <<------------------ User Actions ------------------>> */
 function beginUsingBrowserStack() {
-  const startTime = Date.now();
-  if (userNameInput.value === '') {
+  startTime = getSystemTime();
+
+  if (userNameInput.value === ``) {
     activeDiv.innerHTML = `Please enter a username!`;
   } else {
     updateFirebaseIsActive(true, userNameInput.value, startTime);
-    userNameInput.value = '';
+    userNameInput.value = ``;
   }
 }
 
 function stopUsingBrowserStack() {
-  const formmatedString = activeTimer.innerHTML.replace(/&nbsp;/g, ' ');
+  const formmatedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
   updateFirebaseLogs(activeUser, formmatedString);
-  activeTimer.innerHTML = '';
-  updateFirebaseIsActive(false, '', 0);
+  activeTimer.innerHTML = ``;
+  updateFirebaseIsActive(false, ``, 0);
+}
+
+/* <<------------------ App Functions ------------------>> */
+function setActive() {
+  activeUser = userName;
+  activeDiv.innerHTML = `${userName} has been using BrowserStack`;
+  useButton.disabled = true;
+  stopButton.disabled = false;
+  userNameInput.disabled = true;
+  startTimer(startTime);
+}
+
+function setInActive() {
+  activeDiv.innerHTML = `No one is currently using BrowserStack`;
+  activeTimer.innerHTML = ``;
+  useButton.disabled = false;
+  stopButton.disabled = true;
+  userNameInput.disabled = false;
 }
 
 function startTimer(startNumber) {
-  const initTimer = Date.now();
+  const initTimer = getSystemTime();
   timerStartValue = Math.floor((initTimer - startNumber)/1000);
   if (!timerIsActive) {
-    setInterval(setTime, 1000);
+    setInterval(incrementTimer, 1000);
   }
 }
 
-function setTime() {
+function incrementTimer() {
   if (isActive) {
     timerIsActive = true;
     ++timerStartValue;
-    activeTimer.innerHTML = formatTime(timerStartValue)
+    activeTimer.innerHTML = formatTime(timerStartValue);
   }
 }
 
+// Format time to readable string.
 function formatTime(time) {
   let seconds;
   let hours;
   let minutes;
-  let stringMinutes = '';
-  let stringHours = '';
+  let stringMinutes = ``;
+  let stringHours = ``;
 
-  const stringStart = 'For&nbsp;';
-  const stringSeconds = '&nbsp;seconds';
+  const stringStart = `For&nbsp;`;
+  const stringSeconds = `&nbsp;seconds`;
 
   if (time > 7200) {
     seconds = time % 60;
     minutes = Math.floor((time % 3600)/60);
     hours = Math.floor(time/3600);
-    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
-    stringHours ='&nbsp;hours&nbsp;and&nbsp;'
+    stringMinutes = `&nbsp;minutes&nbsp;and&nbsp;`;
+    stringHours = `&nbsp;hours&nbsp;and&nbsp;`;
   } else if (time > 3600) {
     seconds = time % 60;
     minutes = Math.floor((time % 3600)/60);
     hours = Math.floor(time/3600);
-    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
-    stringHours ='&nbsp;hour&nbsp;and&nbsp;'
+    stringMinutes = `&nbsp;minutes&nbsp;and&nbsp;`;
+    stringHours = `&nbsp;hour&nbsp;and&nbsp;`;
   } else if (time > 120) {
     seconds = (time % 60);
     minutes = Math.floor(time/60);
-    hours = '';
-    stringMinutes = '&nbsp;minutes&nbsp;and&nbsp;';
+    hours = ``;
+    stringMinutes = `&nbsp;minutes&nbsp;and&nbsp;`;
    } else if (time > 60) {
     seconds = (time % 60);
     minutes = Math.floor(time/60);
-    hours = '';
-    stringMinutes = '&nbsp;minute&nbsp;and&nbsp;';
+    hours = ``;
+    stringMinutes = `&nbsp;minute&nbsp;and&nbsp;`;
   } else {
     seconds = time;
-    minutes = '';
-    hours = '';
+    minutes = ``;
+    hours = ``;
   }
   return stringStart + hours + stringHours + minutes + stringMinutes + seconds + stringSeconds;
 }
 
-function updateFirebaseIsActive(bool, string, number) {
-  db.ref('isActive').set({
-    userName: string,
-    isActive: bool,
-    startTime: number
-  }, (error) => {
-    if (error) {
-      console.log('error writing to FB');
-    } else {
-      console.log('success updating isActive');
-    }
-  });
-}
-
-function updateFirebaseLogs(userName, timerString) {
-  const logTime = Date.now();
-  const dateToday = getCurrentDate();
-
-  db.ref(`logs/${dateToday}/${userName}-${timerString}`).set({
-    user: userName,
-    timeUsed: timerString,
-    logRecoredTime: logTime
-  }, (error) => {
-    if (error) {
-      console.log('error writing to FB');
-    } else {
-      console.log('success updating logs');
-    }
-  });
-}
-
+// Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
   const day = date.getDate();
@@ -169,4 +159,40 @@ function getCurrentDate() {
   }
 
   return `${day}-${month}-${year}`;
+}
+
+function getSystemTime() {
+  return Date.now();
+}
+
+/* <<------------------ Calls to Firebase ------------------>> */
+function updateFirebaseIsActive(bool, string, number) {
+  db.ref('isActive').set({
+    userName: string,
+    isActive: bool,
+    startTime: number
+  }, (error) => {
+    if (error) {
+      console.log(`error writing to FB`);
+    } else {
+      console.log(`success updating isActive`);
+    }
+  });
+}
+
+function updateFirebaseLogs(userName, timerString) {
+  const logTime = getSystemTime();
+  const dateToday = getCurrentDate();
+
+  db.ref(`logs/${dateToday}/${userName}-${timerString}`).set({
+    user: userName,
+    timeUsed: timerString,
+    logRecoredTime: logTime
+  }, (error) => {
+    if (error) {
+      console.log(`error writing to FB`);
+    } else {
+      console.log(`success updating logs`);
+    }
+  });
 }
