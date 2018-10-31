@@ -170,7 +170,7 @@ function updateFirebaseIsActive(bool, string, number) {
     startTime: number
   }, (error) => {
     if (error) {
-      console.log(`error writing to FB`);
+      console.log(`error updating FB`);
     } else {
       console.log(`success updating isActive`);
     }
@@ -189,7 +189,7 @@ function updateFirebaseLogs(activeUser, timerString) {
     if (error) {
       console.log(`error writing to FB`);
     } else {
-      console.log(`success updating logs`);
+      console.log(`success writing to logs`);
     }
   });
 }
