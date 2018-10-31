@@ -78,7 +78,7 @@ function setActive() {
 }
 
 function setInActive() {
-  activeDiv.innerHTML = `No one is currently using BrowserStack`;
+  activeDiv.innerHTML = `BrowserStack is free to use!`;
   activeTimer.innerHTML = ``;
   stopButton.disabled = true;
   useButton.disabled = false;
