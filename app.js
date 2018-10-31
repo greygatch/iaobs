@@ -57,7 +57,6 @@ function beginUsingBrowserStack() {
     activeDiv.innerHTML = `Please enter a name!`;
   } else {
     updateFirebaseIsActive(true, userNameInput.value, startTime);
-    userNameInput.value = ``;
   }
 }
 
@@ -74,6 +73,7 @@ function setActive() {
   stopButton.disabled = false;
   useButton.disabled = true;
   userNameInput.disabled = true;
+  userNameInput.value = ``;
   startTimer(startTime);
 }
 
@@ -99,19 +99,19 @@ function incrementTimer() {
   if (isActive) {
     timerIsActive = true;
     ++timerStartValue;
-    activeTimer.innerHTML = formatTime(timerStartValue);
+    activeTimer.innerHTML = formatTimer(timerStartValue);
   }
 }
 
-// Format time to readable string.
-function formatTime(time) {
+// Format timer to human readable string.
+function formatTimer(time) {
   let seconds;
   let hours;
   let minutes;
   let stringMinutes = ``;
   let stringHours = ``;
+  let stringSeconds = `&nbsp;seconds`;
 
-  const stringSeconds = `&nbsp;seconds`;
   const stringStart = `For&nbsp;`;
 
   if (time > 7200) {
@@ -140,6 +140,7 @@ function formatTime(time) {
     seconds = time;
     minutes = ``;
     hours = ``;
+    time == 1 ? stringSeconds = `&nbsp;second` : null;
   }
 
   return stringStart + hours + stringHours + minutes + stringMinutes + seconds + stringSeconds;
