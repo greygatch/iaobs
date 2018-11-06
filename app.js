@@ -1,10 +1,10 @@
 const config = {
-  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
-  authDomain: "iaobs-3941b.firebaseapp.com",
-  databaseURL: "https://iaobs-3941b.firebaseio.com",
-  projectId: "iaobs-3941b",
-  storageBucket: "iaobs-3941b.appspot.com",
-  messagingSenderId: "981123119987"
+  apiKey: "AIzaSyCpQx9uI62YWpkoMsnBd3JIo857uDt0OYk",
+  authDomain: "testtest123-6376c.firebaseapp.com",
+  databaseURL: "https://testtest123-6376c.firebaseio.com",
+  projectId: "testtest123-6376c",
+  storageBucket: "testtest123-6376c.appspot.com",
+  messagingSenderId: "505046414181"
 };
 
 firebase.initializeApp(config);
@@ -149,9 +149,10 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
-  const day = date.getDate();
-  const month = date.getMonth()+1;
   const year = date.getFullYear();
+
+  let day = date.getDate();
+  let month = date.getMonth()+1;
 
   day < 10 ? day = `0${day}` : null;
   month < 10 ? month = `0${month}` : '';
