@@ -149,9 +149,10 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
-  const day = date.getDate();
-  const month = date.getMonth()+1;
   const year = date.getFullYear();
+
+  let day = date.getDate();
+  let month = date.getMonth()+1;
 
   day < 10 ? day = `0${day}` : null;
   month < 10 ? month = `0${month}` : '';
