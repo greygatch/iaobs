@@ -56,7 +56,7 @@ function beginUsingBrowserStack() {
 
   if (userNameInput.value === ``) {
     activeDiv.innerHTML = `Please enter a name!`;
-  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) != -1) {
+  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) !== -1) {
     updateFirebaseIsActive(true, 'Coffee Bean', startTime);
   } else {
     updateFirebaseIsActive(true, userNameInput.value, startTime);
