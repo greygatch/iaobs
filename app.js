@@ -51,12 +51,12 @@ function init() {
 
 /* <<------------------ User Actions ------------------>> */
 function beginUsingBrowserStack() {
-  const coffeeBeanAliasArray = ['Courtney', 'courtney', 'CB', 'cb', 'C-Money']
+  const coffeeBeanAliasArray = ['courtney', 'cb', 'c-money', 'court', 'c-brizzle', 'c-b']
   startTime = getSystemTime();
 
   if (userNameInput.value === ``) {
     activeDiv.innerHTML = `Please enter a name!`;
-  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value) != -1) {
+  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) != -1) {
     updateFirebaseIsActive(true, 'Coffee Bean', startTime);
   } else {
     updateFirebaseIsActive(true, userNameInput.value, startTime);
