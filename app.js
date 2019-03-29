@@ -51,10 +51,13 @@ function init() {
 
 /* <<------------------ User Actions ------------------>> */
 function beginUsingBrowserStack() {
+  const coffeeBeanAliasArray = ['courtney', 'cb', 'c-money', 'court', 'c-brizzle', 'c-b']
   startTime = getSystemTime();
 
   if (userNameInput.value === ``) {
     activeDiv.innerHTML = `Please enter a name!`;
+  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) !== -1) {
+    updateFirebaseIsActive(true, 'Coffee Bean', startTime);
   } else {
     updateFirebaseIsActive(true, userNameInput.value, startTime);
   }
@@ -149,10 +152,10 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
-  const year = date.getFullYear();
 
   let day = date.getDate();
   let month = date.getMonth()+1;
+  let year = date.getFullYear();
 
   day < 10 ? day = `0${day}` : null;
   month < 10 ? month = `0${month}` : '';
