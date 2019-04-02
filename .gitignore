@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+firebase-debug.log*
+
+# Firebase Config Auto Generated files
+.firebaserc
+firebase.json
+.DS_Store
+package-lock.json
+
+# Dependency directories
+node_modules/
+
+# Optional eslint cache
+.esllintrc
