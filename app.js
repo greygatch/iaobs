@@ -55,7 +55,7 @@ document.onreadystatechange = () => {
 
 function init() {
   db.ref('isActive').on('value', snap => {
-    if(snap.val()) {
+    if (snap.val()) {
       activeUser = snap.val().activeUser;
       isActive = snap.val().isActive;
       startTime = snap.val().startTime;
@@ -70,7 +70,7 @@ function init() {
   });
 
   db.ref('waitList').on('value', snap => {
-    if(snap.val()) {
+    if (snap.val()) {
       waitList = snap.val().waitList;
       createList(waitList);
     } else {
@@ -96,9 +96,9 @@ function beginUsingBrowserStack() {
 }
 
 function stopUsingBrowserStack() {
-  const formmatedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
+  const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
 
-  updateLogs(activeUser, formmatedString);
+  updateLogs(activeUser, formattedString);
   updateIsActive(false, ``, 0);
 }
 
@@ -210,7 +210,6 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
-
   let day = date.getDate();
   let month = date.getMonth()+1;
   let year = date.getFullYear();
@@ -225,6 +224,7 @@ function getSystemTime() {
   return Date.now();
 }
 
+// Adds List Items to DOM with delete buttons. Rewrites after update.
 function createList (array) {
   let list = document.createElement('ul');
   for (var i = 0; i < array.length; i++) {
@@ -240,7 +240,7 @@ function createList (array) {
   }
   waitListUI.appendChild(list);
 
-  if(waitListUI.children.length != 1) {
+  if (waitListUI.children.length != 1) {
     waitListUI.firstChild.remove();
   }
 }
