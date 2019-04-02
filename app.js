@@ -15,18 +15,35 @@ const activeTimer = document.getElementById('active-timer');
 const stopButton = document.getElementById('stop-button');
 const useButton = document.getElementById('use-button');
 const userNameInput = document.getElementById('user-name');
+const userEmailInput = document.getElementById('user-email');
+const waitListUI = document.getElementById('wait-list');
+const addEmailButton = document.getElementById('add-user-email');
+const emailInstructions = document.getElementById('email-instructions');
+const appInstructions = document.getElementById('app-instructions');
+
+const appInstructionText = `Enter your name to reserve BrowserStack!`;
+const emailInstructionText = `Enter your email to be notified when BrowserStack becomes available!`;
+const coffeeBeanAliasArray = ['courtney', 'cb', 'c-money', 'court', 'c-brizzle', 'c-b', 'brothers', 'courtney brothers']
 
 let activeUser;
 let isActive;
 let startTime;
+let waitList;
 let timerStartValue;
 let timerIsActive = false;
 
 stopButton.addEventListener('click', stopUsingBrowserStack);
 useButton.addEventListener('click', beginUsingBrowserStack);
+addEmailButton.addEventListener('click', addToWaitList);
 userNameInput.addEventListener('keyup', (event) => {
   if (event.keyCode === 13) {
     beginUsingBrowserStack();
+  }
+});
+
+userEmailInput.addEventListener('keyup', (event) => {
+  if (event.keyCode === 13) {
+    addToWaitList();
   }
 });
 
@@ -38,13 +55,27 @@ document.onreadystatechange = () => {
 
 function init() {
   db.ref('isActive').on('value', snap => {
-    activeUser = snap.val().activeUser;
-    isActive = snap.val().isActive;
-    startTime = snap.val().startTime;
+    if (snap.val()) {
+      activeUser = snap.val().activeUser;
+      isActive = snap.val().isActive;
+      startTime = snap.val().startTime;
+    } else {
+      updateIsActive(false, '', 0)
+    }
     if (isActive) {
       setActive();
     } else {
       setInActive();
+    }
+  });
+
+  db.ref('waitList').on('value', snap => {
+    if (snap.val()) {
+      waitList = snap.val().waitList;
+      createList(waitList);
+    } else {
+      waitList = [];
+      createList(waitList);
     }
   });
 }
@@ -54,32 +85,62 @@ function beginUsingBrowserStack() {
   startTime = getSystemTime();
 
   if (userNameInput.value === ``) {
-    activeDiv.innerHTML = `Please enter a name!`;
+    appInstructions.innerHTML = `Please enter a name!`;
+    appInstructions.style.color = 'firebrick'
+  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) !== -1) {
+    updateIsActive(true, 'Coffee Bean', startTime);
   } else {
-    updateFirebaseIsActive(true, userNameInput.value, startTime);
+    appInstructions.style.color = ''
+    updateIsActive(true, userNameInput.value, startTime);
   }
 }
 
 function stopUsingBrowserStack() {
-  const formmatedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
+  const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
 
-  updateFirebaseLogs(activeUser, formmatedString);
-  updateFirebaseIsActive(false, ``, 0);
+  updateLogs(activeUser, formattedString);
+  updateIsActive(false, ``, 0);
+}
+
+function addToWaitList() {
+  const emailInput = userEmailInput.value;
+  const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g;
+
+  if (emailInput.match(emailRegex)) {
+    waitList.push(userEmailInput.value);
+    userEmailInput.value = "";
+    emailInstructions.innerHTML = emailInstructionText;
+    emailInstructions.style.color = '';
+    updateWaitList(waitList);
+    createList(waitList);
+  } else {
+    emailInstructions.innerHTML = `Please enter a valid email!`;
+    emailInstructions.style.color = 'firebrick';
+  }
+}
+
+function deleteFromWaitList() {
+  waitList.splice(this.value, 1);
+  updateWaitList(waitList);
 }
 
 /* <<------------------ App Functions ------------------>> */
 function setActive() {
   activeDiv.innerHTML = `${activeUser} has been using BrowserStack`;
   stopButton.disabled = false;
+  activeTimer.style.height = '15px';
   useButton.disabled = true;
   userNameInput.disabled = true;
   userNameInput.value = ``;
+  appInstructions.innerHTML = ``;
   startTimer(startTime);
 }
 
 function setInActive() {
   activeDiv.innerHTML = `BrowserStack is free to use!`;
   activeTimer.innerHTML = ``;
+  activeTimer.style.height = '';
+  appInstructions.innerHTML = appInstructionText;
   stopButton.disabled = true;
   useButton.disabled = false;
   userNameInput.disabled = false;
@@ -149,9 +210,15 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
+<<<<<<< HEAD
   const day = date.getDate() < 10 ? `0${date.getDate()}` : null;
   const month = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : '';
   const year = date.getFullYear();
+=======
+  let day = date.getDate();
+  let month = date.getMonth()+1;
+  let year = date.getFullYear();
+>>>>>>> 9af76cd7c737087d25c89f2086d0bc92071c2624
 
   // day < 10 ? day = `0${day}` : null;
   // month < 10 ? month = `0${month}` : '';
@@ -163,22 +230,55 @@ function getSystemTime() {
   return Date.now();
 }
 
+// Adds List Items to DOM with delete buttons. Rewrites after update.
+function createList (array) {
+  let list = document.createElement('ul');
+  for (var i = 0; i < array.length; i++) {
+    const button = document.createElement('button');
+    button.addEventListener('click', deleteFromWaitList);
+    button.innerHTML = 'Delete';
+    button.value = i;
+    button.id = 'delete-email-button'
+    const listItem = document.createElement('li');
+    listItem.appendChild(button);
+    listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
+    list.appendChild(listItem);
+  }
+  waitListUI.appendChild(list);
+
+  if (waitListUI.children.length != 1) {
+    waitListUI.firstChild.remove();
+  }
+}
+
 /* <<------------------ Calls to Firebase ------------------>> */
-function updateFirebaseIsActive(bool, string, number) {
+function updateIsActive(bool, string, number) {
   db.ref('isActive').set({
     activeUser: string,
     isActive: bool,
     startTime: number
   }, (error) => {
     if (error) {
-      console.log(`error updating FB`);
+      console.warn(`error updating FB`);
     } else {
       console.log(`success updating isActive`);
     }
   });
 }
 
-function updateFirebaseLogs(activeUser, timerString) {
+function updateWaitList(array) {
+  db.ref('waitList').set({
+    waitList: array
+  }, (error) => {
+    if (error) {
+      console.warn(`error updating FB waitList`);
+    } else {
+      console.log(`success updating waitList`);
+    }
+  });
+}
+
+function updateLogs(activeUser, timerString) {
   const dateToday = getCurrentDate();
   const logTime = getSystemTime();
 
@@ -188,7 +288,7 @@ function updateFirebaseLogs(activeUser, timerString) {
     logRecoredTime: logTime
   }, (error) => {
     if (error) {
-      console.log(`error writing to FB`);
+      console.warn(`error writing to FB`);
     } else {
       console.log(`success writing to logs`);
     }
