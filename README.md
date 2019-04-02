@@ -23,8 +23,9 @@ firebase init
 - Select a default Firebase project. This is the project that you copied to the config variable in your app.js file.
 - Select JavaScript as your language.
 - Yes for ESLint (optional)
-- No for Overwrite
-- No for Overwrite
+- No package.json Overwrite
+- No index.js Overwrite
+- No .gitignore Overwrite
 - Yes to install dependencies with npm
 ```
 firebase deploy --only functions
