@@ -17,7 +17,6 @@ const useButton = document.getElementById('use-button');
 const userNameInput = document.getElementById('user-name');
 const userEmailInput = document.getElementById('user-email');
 const waitListUI = document.getElementById('wait-list');
-const userEmailRow = document.getElementById('user-email-row');
 const addEmailButton = document.getElementById('add-user-email');
 const emailInstructions = document.getElementById('email-instructions');
 const appInstructions = document.getElementById('app-instructions');
