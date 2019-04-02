@@ -8,15 +8,28 @@
 </head>
 
 <body>
-  <div class='statusBar'>
-    <h3 id='active-status'>Loading...</h3>
-    <h4 id='active-timer'>Loading...</h4>
-  </div>
-  <div class='actionBar'>
-    <input id='user-name' placeholder='Enter your name here' disabled=true>
-    <button class='button' id='use-button' disabled=true>Use BrowserStack</button>
-    <button class='button' id='stop-button' disabled=true>Stop Use</button>
-  </div>
+  <h2>Change's BrowserStack Tracker</h2>
+  <div class='section'> 
+    <div class='browserstackActionBar'>
+      <div class='statusBar'>
+        <h3 id='active-status'>Loading...</h3>
+        <h4 id='active-timer'></h4>
+      </div>
+      <div class='actionBar'>
+        <h6 id='app-instructions'>Loading...</h6>
+        <input id='user-name' placeholder='Enter your name here' disabled=true>
+        <button class='button' id='use-button' disabled=true>Use BrowserStack</button>
+        <button class='button' id='stop-button' disabled=true>Stop Use</button>
+      </div>
+    </div>
+    <div class='waitList'>
+      <h3>Waitlist!</h3>
+      <h6 id='email-instructions'>Enter your email to be notified when BrowserStack becomes available!</h6>
+      <input id='user-email' placeholder='Enter your email here'>
+      <button class='button' id='add-user-email'>Add</button>
+      <div id='wait-list'></div>
+    </div>
+</div>
   <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-database.js"></script>
   <script type="text/javascript" src="app.js"></script>
