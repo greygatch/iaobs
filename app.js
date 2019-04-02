@@ -28,7 +28,7 @@ const coffeeBeanAliasArray = ['courtney', 'cb', 'c-money', 'court', 'c-brizzle',
 let activeUser;
 let isActive;
 let startTime;
-let waitList = [];
+let waitList;
 let timerStartValue;
 let timerIsActive = false;
 
