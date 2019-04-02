@@ -233,10 +233,10 @@ function createList (array) {
     button.innerHTML = 'Delete';
     button.value = i;
     button.id = 'delete-email-button'
-    const item = document.createElement('li');
-    item.appendChild(button);
-    item.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
-    list.appendChild(item);
+    const listItem = document.createElement('li');
+    listItem.appendChild(button);
+    listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
+    list.appendChild(listItem);
   }
   waitListUI.appendChild(list);
 
