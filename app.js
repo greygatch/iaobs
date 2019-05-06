@@ -67,9 +67,9 @@ function init() {
     if (snap.val()) {
       accountKeys.forEach(function(key) {
         if (dbValues[key].isActive) {
-          setActive(key, dbValues);
+          setActive(key);
         } else {
-          setInActive(key, dbValues);
+          setInActive(key);
         }
       })
     } else {
@@ -145,7 +145,7 @@ function deleteFromWaitList() {
 }
 
 /* <<------------------ App Functions ------------------>> */
-function setActive(key, dbValues) {
+function setActive(key) {
   const activeDiv = document.getElementById(`active-status ${key}`);
   const stopButton = document.getElementById(`stop-button ${key}`);
   const useButton = document.getElementById(`use-button ${key}`);
