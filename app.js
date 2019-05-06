@@ -9,38 +9,41 @@ const config = {
 
 firebase.initializeApp(config);
 
-// TODO: Reinstate the active timer and fix logging
-// TODO: Create account specific waitlists
-// TODO: Add focused checked event handler for enter button on input
+// TODO: Create account specific wait-lists
 
 const db = firebase.database();
 const stopButton = document.getElementsByClassName('stop-button');
 const useButton = document.getElementsByClassName('use-button');
 const userEmailInput = document.getElementById('user-email');
+const userNameInput = document.getElementsByClassName('user-name-input');
 const waitListUI = document.getElementById('wait-list');
 const addEmailButton = document.getElementById('add-user-email');
 const emailInstructions = document.getElementById('email-instructions');
 const appInstructions = document.getElementById('app-instructions');
-
 const appInstructionText = `Enter your name to reserve this account!`;
 const emailInstructionText = `Enter your email to be notified when BrowserStack becomes available!`;
 
-let activeUser;
-let isActive;
-let startTime;
 let waitList;
-let timerStartValue;
+let timerStartValue = {};
 let dbValues;
-let timerIsActive = false;
+
+/* <<------------------ Event Handler Setup ------------------>> */
 
 for(let i = 0; i < stopButton.length; i++) {
-  stopButton[i].addEventListener('click', function(){stopUsingBrowserStack(useButton[i])});
-}
-for(let i = 0; i < useButton.length; i++) {
-  useButton[i].addEventListener('click', function(){beginUsingBrowserStack(useButton[i])});
+  stopButton[i].addEventListener('click', () => {stopUsingBrowserStack(stopButton[i])});
 }
 
-addEmailButton.addEventListener('click', addToWaitList);
+for(let i = 0; i < useButton.length; i++) {
+  useButton[i].addEventListener('click', () => {beginUsingBrowserStack(useButton[i])});
+}
+
+for(let i = 0; i < userNameInput.length; i++) {
+  userNameInput[i].addEventListener('keyup', (event) => {
+    if (event.keyCode === 13) {
+      beginUsingBrowserStack(userNameInput[i]);
+    }
+  })
+}
 
 userEmailInput.addEventListener('keyup', (event) => {
   if (event.keyCode === 13) {
@@ -54,6 +57,9 @@ document.onreadystatechange = () => {
   }
 }
 
+addEmailButton.addEventListener('click', addToWaitList);
+
+/* <<------------------ Init Fires on FB Update ------------------>> */
 function init() {
   db.ref(`accounts`).on('value', snap => {
     const accountKeys = Object.keys({...snap.val()});
@@ -61,9 +67,6 @@ function init() {
     if (snap.val()) {
       accountKeys.forEach(function(key) {
         if (dbValues[key].isActive) {
-          activeUser = snap.val().activeUser;
-          isActive = snap.val().isActive;
-          startTime = snap.val().startTime;
           setActive(key, dbValues);
         } else {
           setInActive(key, dbValues);
@@ -103,11 +106,12 @@ function beginUsingBrowserStack(useButton) {
   }
 }
 
-function stopUsingBrowserStack(button) {
-  const key = button.id.split(' ')[1];
+function stopUsingBrowserStack(stopButton) {
+  const key = stopButton.id.split(' ')[1];
   const activeTimer = document.getElementById(`active-timer ${key}`);
   const activeUser = dbValues[key].activeUser;
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
+  delete timerStartValue[key]
 
   updateLogs(activeUser, formattedString);
   updateIsActive(false, ``, 0, key);
@@ -187,18 +191,27 @@ function setInActive(key) {
 // Init the timer and set the starting value.
 function startTimer(startNumber, key) {
   const initTimer = getSystemTime();
-  timerStartValue = Math.floor((initTimer - startNumber)/1000);
-  if (!timerIsActive) {
-    setInterval(incrementTimer(key), 1000);
+  if (!timerStartValue[key]) {
+    timerStartValue[key] = {
+      isActive: false,
+      value: Math.floor((initTimer - startNumber)/1000)
+    }
+  }
+
+  // If the timer has already been started do not call incrementTimer again
+  if (dbValues[key].isActive && !timerStartValue[key].isActive) {
+    timerStartValue[key].isActive = true;
+    setInterval(incrementTimer, 1000, key);
   }
 }
 
 // Add 1 every second to the timer value & display.
 function incrementTimer(key) {
   const activeTimer = document.getElementById(`active-timer ${key}`);
-  timerIsActive = true;
-  ++timerStartValue;
-  // activeTimer.innerHTML = formatTimer(timerStartValue);
+  if (timerStartValue[key]) {
+    ++timerStartValue[key].value;
+    activeTimer.innerHTML = formatTimer(timerStartValue[key].value);
+  }
 }
 
 // Format timer to human readable string.
