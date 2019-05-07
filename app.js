@@ -1,10 +1,11 @@
 const config = {
-  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
-  authDomain: "iaobs-3941b.firebaseapp.com",
-  databaseURL: "https://iaobs-3941b.firebaseio.com",
-  projectId: "iaobs-3941b",
-  storageBucket: "iaobs-3941b.appspot.com",
-  messagingSenderId: "981123119987"
+  apiKey: "AIzaSyAR6ITxJ5W0KPi4khecgpZQV8dFc0tfjjM",
+  authDomain: "randomtestbed.firebaseapp.com",
+  databaseURL: "https://randomtestbed.firebaseio.com",
+  projectId: "randomtestbed",
+  storageBucket: "randomtestbed.appspot.com",
+  messagingSenderId: "274147985197",
+  appId: "1:274147985197:web:7acaff8b54cf0bfc"
 };
 
 firebase.initializeApp(config);
@@ -15,6 +16,7 @@ const db = firebase.database();
 const stopButton = document.getElementsByClassName('stop-button');
 const useButton = document.getElementsByClassName('use-button');
 const userEmailInput = document.getElementById('user-email');
+const accountInput = document.getElementById('account-select');
 const userNameInput = document.getElementsByClassName('user-name-input');
 const waitListUI = document.getElementById('wait-list');
 const addEmailButton = document.getElementById('add-user-email');
@@ -24,6 +26,7 @@ const appInstructionText = `Enter your name to reserve this account!`;
 const emailInstructionText = `Enter your email to be notified when BrowserStack becomes available!`;
 
 let waitList;
+let waitListKeys;
 let timerStartValue = {};
 let dbValues;
 
@@ -82,10 +85,12 @@ function init() {
   db.ref('waitList').on('value', snap => {
     if (snap.val()) {
       waitList = snap.val().waitList;
-      createList(waitList);
+      waitListKeys = snap.val().waitListKeys;
+      createList(waitList, waitListKeys);
     } else {
       waitList = [];
-      createList(waitList);
+      waitListKeys = [];
+      createList(waitList, waitListKeys);
     }
   });
 }
@@ -121,27 +126,39 @@ function addToWaitList() {
   const emailInput = userEmailInput.value;
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g;
 
-  if (emailInput.match(emailRegex)) {
+  let accountInputError = '';
+  let emailError = '';
+
+  if (emailInput.match(emailRegex) && accountInput.value) {
     if (waitList.indexOf(emailInput) === -1) {
       waitList.push(userEmailInput.value);
-      userEmailInput.value = "";
+      waitListKeys.push(accountInput.value)
+      userEmailInput.value = '';
+      accountInput.value = '';
       emailInstructions.innerHTML = emailInstructionText;
       emailInstructions.style.color = '';
-      updateWaitList(waitList);
+      updateWaitList(waitList, waitListKeys);
       createList(waitList);
     } else {
       emailInstructions.innerHTML = `This email is already in the wait list!`;
       emailInstructions.style.color = 'firebrick';
     }
   } else {
-    emailInstructions.innerHTML = `Please enter a valid email!`;
+    if (!accountInput.value) {
+      accountInputError = 'Please choose an account to wait for!'
+    }
+    if (!emailInput.match(emailRegex)) {
+      emailError = 'Please enter a valid email!';
+    }
+    emailInstructions.innerHTML = `${emailError} ${accountInputError}`;
     emailInstructions.style.color = 'firebrick';
   }
 }
 
 function deleteFromWaitList() {
   waitList.splice(this.value, 1);
-  updateWaitList(waitList);
+  waitListKeys.splice(this.value, 1);
+  updateWaitList(waitList, waitListKeys);
 }
 
 /* <<------------------ App Functions ------------------>> */
@@ -277,21 +294,23 @@ function getSystemTime() {
 // Adds List Items to DOM with delete buttons. Rewrites after update.
 function createList (array) {
   let list = document.createElement('ul');
-  for (var i = 0; i < array.length; i++) {
-    const button = document.createElement('button');
-    button.addEventListener('click', deleteFromWaitList);
-    button.innerHTML = 'Delete';
-    button.value = i;
-    button.id = 'delete-email-button'
-    const listItem = document.createElement('li');
-    listItem.appendChild(button);
-    listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
-    list.appendChild(listItem);
-  }
-  waitListUI.appendChild(list);
-
-  if (waitListUI.children.length != 1) {
-    waitListUI.firstChild.remove();
+  if (array) {
+    for (var i = 0; i < array.length; i++) {
+      const button = document.createElement('button');
+      button.addEventListener('click', deleteFromWaitList);
+      button.innerHTML = 'Delete';
+      button.value = i;
+      button.id = 'delete-email-button'
+      const listItem = document.createElement('li');
+      listItem.appendChild(button);
+      listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
+      list.appendChild(listItem);
+    }
+    waitListUI.appendChild(list);
+  
+    if (waitListUI.children.length != 1) {
+      waitListUI.firstChild.remove();
+    }
   }
 }
 
@@ -312,9 +331,10 @@ function updateIsActive(bool, string, number, id) {
   }
 }
 
-function updateWaitList(array) {
+function updateWaitList(array, waitListKeys) {
   db.ref('waitList').set({
-    waitList: array
+    waitList: array,
+    waitListKeys: waitListKeys
   }, (error) => {
     if (error) {
       console.warn(`error updating FB waitList`);
