@@ -49,11 +49,10 @@ exports.activeUserChanged = functions.database.ref('/accounts')
 });
 
 function sendReminderEmail (waitListArray, waitListKeys, beforeName, startTime, changedAccount) {
-  let accountName = changedAccount.split('');
-  accountName.splice(0,1,accountName[0].toUpperCase())
-  accountName = accountName.join('');
-  const indexOfChangedAccountEmail =  waitListKeys.indexOf(accountName);
-  let email = waitListArray[indexOfChangedAccountEmail];
+  const upperCaseWaitListKeys = [];
+  waitListKeys.forEach((key) => {upperCaseWaitListKeys.push(key.toUpperCase())})
+  const indexOfChangedAccountEmail =  upperCaseWaitListKeys.indexOf(accountName.toUpperCase());
+  const email = waitListArray[indexOfChangedAccountEmail];
   const mailOptions = {
     from: `${APP_NAME} <browserstackautobot@gmail.com>`,
     to: email,
@@ -64,7 +63,9 @@ function sendReminderEmail (waitListArray, waitListKeys, beforeName, startTime, 
   const longText = `after only ${hours} hours ...`;
 
   let shownText = shortText;
-
+  let accountName = changedAccount.split('');
+  accountName.splice(0, 1, accountName[0].toUpperCase())
+  accountName = accountName.join('');
 
   if (hours > 2) {
     shownText = longText;

@@ -169,7 +169,7 @@ function setActive(key) {
   const activeUser = dbValues[key].activeUser;
   let accountName = key.split('');
 
-  accountName.splice(0,1,accountName[0].toUpperCase())
+  accountName.splice(0, 1, accountName[0].toUpperCase())
   accountName = accountName.join('');
   startTime = dbValues[key].startTime
 
