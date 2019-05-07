@@ -72,9 +72,9 @@ function init() {
         }
       })
     } else {
-      updateIsActive(false, '', 0, 'qa')
-      updateIsActive(false, '', 0, 'evan')
-      updateIsActive(false, '', 0, 'justin')
+      updateIsActive(false, ``, 0, `qa`)
+      updateIsActive(false, ``, 0, `evan`)
+      updateIsActive(false, ``, 0, `justin`)
     }
   });
 
@@ -114,7 +114,6 @@ function stopUsingBrowserStack(stopButton) {
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
   delete timerStartValue[key]
 
-  clearInterval(intervalObject[key]);
   updateLogs(activeUser, formattedString);
   updateIsActive(false, ``, 0, key);
 }
@@ -132,8 +131,8 @@ function addToWaitList() {
     if (waitList.indexOf(emailInput) === -1) {
       waitList.push(userEmailInput.value);
       waitListKeys.push(accountInput.value)
-      userEmailInput.value = '';
-      accountInput.value = '';
+      userEmailInput.value = ``;
+      accountInput.value = ``;
       emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
       emailInstructions.style.color = '';
       updateWaitList(waitList, waitListKeys);
@@ -144,10 +143,10 @@ function addToWaitList() {
     }
   } else {
     if (!accountInput.value) {
-      accountInputError = 'Please choose an account to wait for!'
+      accountInputError = `Please choose an account to wait for!`
     }
     if (!emailInput.match(emailRegex)) {
-      emailError = 'Please enter a valid email!';
+      emailError = `Please enter a valid email!`;
     }
     emailInstructions.innerHTML = `${emailError} ${accountInputError}`;
     emailInstructions.style.color = 'firebrick';
@@ -196,9 +195,10 @@ function setInActive(key) {
     const userNameInput = document.getElementById(`user-name ${key}`);
     const appInstructions = document.getElementById(`app-instructions ${key}`);
 
+    clearInterval(intervalObject[key]);
     activeDiv.innerHTML = `${key}'s BrowserStack account is available!`;
     activeTimer.innerHTML = ``;
-    activeTimer.style.height = '';
+    activeTimer.style.height = ``;
     appInstructions.innerHTML = `Enter your name to reserve this account!`;
     stopButton.disabled = true;
     useButton.disabled = false;
@@ -221,7 +221,7 @@ function startTimer(startNumber, key) {
   // If the timer has already been started do not call incrementTimer again
   if (dbValues[key].isActive && !timerStartValue[key].isActive) {
     timerStartValue[key].isActive = true;
-    // Sets the interval to an object bound by the key. We need this later to clear the interval.
+    // Sets the unique interval id to an object bound by the key. We need this later to clear the interval.
     intervalObject[key] = setInterval(incrementTimer, 1000, key);
   }
 }
@@ -288,7 +288,7 @@ function getCurrentDate() {
   let year = date.getFullYear();
 
   day < 10 ? day = `0${day}` : null;
-  month < 10 ? month = `0${month}` : '';
+  month < 10 ? month = `0${month}` : ``;
 
   return `${month}-${day}-${year}`;
 }
@@ -306,7 +306,7 @@ function createList (array) {
       const button = document.createElement('button');
 
       button.addEventListener('click', deleteFromWaitList);
-      button.innerHTML = 'Delete';
+      button.innerHTML = `Delete`;
       button.value = i;
       button.id = 'delete-email-button'
       const listItem = document.createElement('li');
@@ -318,7 +318,7 @@ function createList (array) {
     waitListUI.appendChild(list);
   
     // Needed? TODO: Remove?
-    if (waitListUI.children.length != 1) {
+    if (waitListUI.children.length !== 1) {
       waitListUI.firstChild.remove();
     }
   }

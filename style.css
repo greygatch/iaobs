@@ -31,12 +31,13 @@ li {
 }
 
 .section {
-  padding: 1em 0 3em 0;
+  border: 1px solid black;
+  padding: 1em 1em 3em 1em;
   display: flex;
 }
 
 .waitList {
-  padding: 0 25% 0 25%;
+  padding: 2% 25% 0 25%;
   width: 50%;
 }
 
@@ -56,7 +57,7 @@ li {
 }
 
 #user-email {
-  width: 30%;
+  width: 17em;
 }
 
 #user-name {
