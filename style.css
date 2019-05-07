@@ -2,6 +2,10 @@
   display: none;
 }
 
+h3::first-letter {
+  text-transform: uppercase;
+}
+
 body {
   padding: 3em 0 0 0;
   background: Cornsilk;
@@ -19,10 +23,6 @@ li {
   margin: 1em 0 0 0;
 }
 
-.browserstackActionBar {
-  width: 35%;
-}
-
 .button {
   width: 125px;
   height: 20px;
@@ -36,7 +36,8 @@ li {
 }
 
 .waitList {
-  width: 65%;
+  padding: 0 25% 0 25%;
+  width: 50%;
 }
 
 #delete-email-button {
@@ -47,6 +48,11 @@ li {
 
 #stop-button {
  background-color: IndianRed;
+}
+
+#tracker-wrapper {
+  display: flex;
+  justify-content: space-around;
 }
 
 #user-email {

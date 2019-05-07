@@ -10,36 +10,39 @@ const config = {
 firebase.initializeApp(config);
 
 const db = firebase.database();
-const activeDiv = document.getElementById('active-status');
-const activeTimer = document.getElementById('active-timer');
-const stopButton = document.getElementById('stop-button');
-const useButton = document.getElementById('use-button');
-const userNameInput = document.getElementById('user-name');
+const stopButton = document.getElementsByClassName('stop-button');
+const useButton = document.getElementsByClassName('use-button');
 const userEmailInput = document.getElementById('user-email');
+const accountInput = document.getElementById('account-select');
+const userNameInput = document.getElementsByClassName('user-name-input');
 const waitListUI = document.getElementById('wait-list');
 const addEmailButton = document.getElementById('add-user-email');
 const emailInstructions = document.getElementById('email-instructions');
 const appInstructions = document.getElementById('app-instructions');
 
-const appInstructionText = `Enter your name to reserve BrowserStack!`;
-const emailInstructionText = `Enter your email to be notified when BrowserStack becomes available!`;
-const coffeeBeanAliasArray = ['courtney', 'cb', 'c-money', 'court', 'c-brizzle', 'c-b', 'brothers', 'courtney brothers']
-
-let activeUser;
-let isActive;
-let startTime;
 let waitList;
-let timerStartValue;
-let timerIsActive = false;
+let waitListKeys;
+let timerStartValue = {};
+let dbValues;
+let intervalObject = {};
 
-stopButton.addEventListener('click', stopUsingBrowserStack);
-useButton.addEventListener('click', beginUsingBrowserStack);
-addEmailButton.addEventListener('click', addToWaitList);
-userNameInput.addEventListener('keyup', (event) => {
-  if (event.keyCode === 13) {
-    beginUsingBrowserStack();
-  }
-});
+/* <<------------------ Event Handler Setup ------------------>> */
+
+for(let i = 0; i < stopButton.length; i++) {
+  stopButton[i].addEventListener('click', () => {stopUsingBrowserStack(stopButton[i])});
+}
+
+for(let i = 0; i < useButton.length; i++) {
+  useButton[i].addEventListener('click', () => {beginUsingBrowserStack(useButton[i])});
+}
+
+for(let i = 0; i < userNameInput.length; i++) {
+  userNameInput[i].addEventListener('keyup', (event) => {
+    if (event.keyCode === 13) {
+      beginUsingBrowserStack(userNameInput[i]);
+    }
+  })
+}
 
 userEmailInput.addEventListener('keyup', (event) => {
   if (event.keyCode === 13) {
@@ -53,132 +56,196 @@ document.onreadystatechange = () => {
   }
 }
 
+addEmailButton.addEventListener('click', addToWaitList);
+
+/* <<------------------ Init Fires on FB Update ------------------>> */
 function init() {
-  db.ref('isActive').on('value', snap => {
+  db.ref(`accounts`).on('value', snap => {
+    const accountKeys = Object.keys({...snap.val()});
+    dbValues = snap.val();
     if (snap.val()) {
-      activeUser = snap.val().activeUser;
-      isActive = snap.val().isActive;
-      startTime = snap.val().startTime;
+      accountKeys.forEach(function(key) {
+        if (dbValues[key].isActive) {
+          setActive(key);
+        } else {
+          setInActive(key);
+        }
+      })
     } else {
-      updateIsActive(false, '', 0)
-    }
-    if (isActive) {
-      setActive();
-    } else {
-      setInActive();
+      updateIsActive(false, '', 0, 'qa')
+      updateIsActive(false, '', 0, 'evan')
+      updateIsActive(false, '', 0, 'justin')
     }
   });
 
   db.ref('waitList').on('value', snap => {
     if (snap.val()) {
       waitList = snap.val().waitList;
-      createList(waitList);
+      waitListKeys = snap.val().waitListKeys;
+      createList(waitList, waitListKeys);
     } else {
       waitList = [];
-      createList(waitList);
+      waitListKeys = [];
+      createList(waitList, waitListKeys);
     }
   });
 }
 
 /* <<------------------ User Actions ------------------>> */
-function beginUsingBrowserStack() {
+function beginUsingBrowserStack(useButton) {
+  const key = useButton.id.split(' ')[1];
   startTime = getSystemTime();
+  const userNameInput = document.getElementById(`user-name ${key}`).value;
+  const appInstructions = document.getElementById(`app-instructions ${key}`);
 
-  if (userNameInput.value === ``) {
+  if (userNameInput === ``) {
     appInstructions.innerHTML = `Please enter a name!`;
     appInstructions.style.color = 'firebrick'
-  } else if (coffeeBeanAliasArray.indexOf(userNameInput.value.toLowerCase()) !== -1) {
-    updateIsActive(true, 'Coffee Bean', startTime);
   } else {
     appInstructions.style.color = ''
-    updateIsActive(true, userNameInput.value, startTime);
+    updateIsActive(true, userNameInput, startTime, key);
   }
 }
 
-function stopUsingBrowserStack() {
+function stopUsingBrowserStack(stopButton) {
+  const key = stopButton.id.split(' ')[1];
+  const activeTimer = document.getElementById(`active-timer ${key}`);
+  const activeUser = dbValues[key].activeUser;
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
+  delete timerStartValue[key]
 
+  clearInterval(intervalObject[key]);
   updateLogs(activeUser, formattedString);
-  updateIsActive(false, ``, 0);
+  updateIsActive(false, ``, 0, key);
 }
 
 function addToWaitList() {
   const emailInput = userEmailInput.value;
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g;
 
-  if (emailInput.match(emailRegex)) {
+  let accountInputError = '';
+  let emailError = '';
+
+  // Checks for email legitimacy & accountInput has a value. If both fail, show both error messages.
+  if (emailInput.match(emailRegex) && accountInput.value) {
+    // Checks if email already exists in the que. If fails show error state.
     if (waitList.indexOf(emailInput) === -1) {
       waitList.push(userEmailInput.value);
-      userEmailInput.value = "";
-      emailInstructions.innerHTML = emailInstructionText;
+      waitListKeys.push(accountInput.value)
+      userEmailInput.value = '';
+      accountInput.value = '';
+      emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
       emailInstructions.style.color = '';
-      updateWaitList(waitList);
+      updateWaitList(waitList, waitListKeys);
       createList(waitList);
     } else {
       emailInstructions.innerHTML = `This email is already in the wait list!`;
       emailInstructions.style.color = 'firebrick';
     }
   } else {
-    emailInstructions.innerHTML = `Please enter a valid email!`;
+    if (!accountInput.value) {
+      accountInputError = 'Please choose an account to wait for!'
+    }
+    if (!emailInput.match(emailRegex)) {
+      emailError = 'Please enter a valid email!';
+    }
+    emailInstructions.innerHTML = `${emailError} ${accountInputError}`;
     emailInstructions.style.color = 'firebrick';
   }
 }
 
+// Removes the selected email from dom lists and saves to DB.
 function deleteFromWaitList() {
   waitList.splice(this.value, 1);
-  updateWaitList(waitList);
+  waitListKeys.splice(this.value, 1);
+  updateWaitList(waitList, waitListKeys);
 }
 
 /* <<------------------ App Functions ------------------>> */
-function setActive() {
-  activeDiv.innerHTML = `${activeUser} has been using BrowserStack`;
-  stopButton.disabled = false;
+function setActive(key) {
+  const activeDiv = document.getElementById(`active-status ${key}`);
+  const stopButton = document.getElementById(`stop-button ${key}`);
+  const useButton = document.getElementById(`use-button ${key}`);
+  const activeTimer = document.getElementById(`active-timer ${key}`);
+  const userNameInput = document.getElementById(`user-name ${key}`);
+  const appInstructions = document.getElementById(`app-instructions ${key}`);
+  const activeUser = dbValues[key].activeUser;
+  let accountName = key.split('');
+
+  // Sets first letter to Uppercase. Might find a better solution in css.
+  accountName.splice(0, 1, accountName[0].toUpperCase())
+  accountName = accountName.join('');
+  startTime = dbValues[key].startTime
+
+  activeDiv.innerHTML = `${activeUser} is using ${accountName}'s BrowserStack account`;
   activeTimer.style.height = '15px';
-  useButton.disabled = true;
   userNameInput.disabled = true;
   userNameInput.value = ``;
+  stopButton.disabled = false;
+  useButton.disabled = true;
   appInstructions.innerHTML = ``;
-  startTimer(startTime);
+  startTimer(startTime, key);
 }
 
-function setInActive() {
-  activeDiv.innerHTML = `BrowserStack is free to use!`;
-  activeTimer.innerHTML = ``;
-  activeTimer.style.height = '';
-  appInstructions.innerHTML = appInstructionText;
-  stopButton.disabled = true;
-  useButton.disabled = false;
-  userNameInput.disabled = false;
+function setInActive(key) {
+  if (key !== undefined) {
+    const stopButton = document.getElementById(`stop-button ${key}`);
+    const useButton = document.getElementById(`use-button ${key}`);
+    const activeDiv = document.getElementById(`active-status ${key}`);
+    const activeTimer = document.getElementById(`active-timer ${key}`);
+    const userNameInput = document.getElementById(`user-name ${key}`);
+    const appInstructions = document.getElementById(`app-instructions ${key}`);
+
+    activeDiv.innerHTML = `${key}'s BrowserStack account is available!`;
+    activeTimer.innerHTML = ``;
+    activeTimer.style.height = '';
+    appInstructions.innerHTML = `Enter your name to reserve this account!`;
+    stopButton.disabled = true;
+    useButton.disabled = false;
+    userNameInput.disabled = false;
+  }
 }
 
 // Init the timer and set the starting value.
-function startTimer(startNumber) {
+function startTimer(startNumber, key) {
   const initTimer = getSystemTime();
-  timerStartValue = Math.floor((initTimer - startNumber)/1000);
-  if (!timerIsActive) {
-    setInterval(incrementTimer, 1000);
+
+  // If the key does not exist on timerStartValue then create it.
+  if (!timerStartValue[key]) {
+    timerStartValue[key] = {
+      isActive: false,
+      value: Math.floor((initTimer - startNumber)/1000)
+    }
+  }
+
+  // If the timer has already been started do not call incrementTimer again
+  if (dbValues[key].isActive && !timerStartValue[key].isActive) {
+    timerStartValue[key].isActive = true;
+    // Sets the interval to an object bound by the key. We need this later to clear the interval.
+    intervalObject[key] = setInterval(incrementTimer, 1000, key);
   }
 }
 
 // Add 1 every second to the timer value & display.
-function incrementTimer() {
-  if (isActive) {
-    timerIsActive = true;
-    ++timerStartValue;
-    activeTimer.innerHTML = formatTimer(timerStartValue);
+function incrementTimer(key) {
+  const activeTimer = document.getElementById(`active-timer ${key}`);
+
+  if (timerStartValue[key]) {
+    ++timerStartValue[key].value;
+    activeTimer.innerHTML = formatTimer(timerStartValue[key].value);
   }
 }
 
 // Format timer to human readable string.
 function formatTimer(time) {
+  const stringStart = `For&nbsp;`;
+
   let seconds;
   let hours;
   let minutes;
   let stringMinutes = ``;
   let stringHours = ``;
   let stringSeconds = `&nbsp;seconds`;
-
-  const stringStart = `For&nbsp;`;
 
   if (time > 7200) {
     seconds = time % 60;
@@ -227,45 +294,54 @@ function getSystemTime() {
   return Date.now();
 }
 
-// Adds List Items to DOM with delete buttons. Rewrites after update.
+// Draws List Items to DOM with delete buttons. Rewrites after DB update to wait-list.
 function createList (array) {
-  let list = document.createElement('ul');
-  for (var i = 0; i < array.length; i++) {
-    const button = document.createElement('button');
-    button.addEventListener('click', deleteFromWaitList);
-    button.innerHTML = 'Delete';
-    button.value = i;
-    button.id = 'delete-email-button'
-    const listItem = document.createElement('li');
-    listItem.appendChild(button);
-    listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
-    list.appendChild(listItem);
-  }
-  waitListUI.appendChild(list);
+  const list = document.createElement('ul');
 
-  if (waitListUI.children.length != 1) {
-    waitListUI.firstChild.remove();
+  if (array) {
+    for (var i = 0; i < array.length; i++) {
+      const button = document.createElement('button');
+
+      button.addEventListener('click', deleteFromWaitList);
+      button.innerHTML = 'Delete';
+      button.value = i;
+      button.id = 'delete-email-button'
+      const listItem = document.createElement('li');
+
+      listItem.appendChild(button);
+      listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]} for ${waitListKeys[i]}'s account`));
+      list.appendChild(listItem);
+    }
+    waitListUI.appendChild(list);
+  
+    // Needed? TODO: Remove?
+    if (waitListUI.children.length != 1) {
+      waitListUI.firstChild.remove();
+    }
   }
 }
 
 /* <<------------------ Calls to Firebase ------------------>> */
-function updateIsActive(bool, string, number) {
-  db.ref('isActive').set({
-    activeUser: string,
-    isActive: bool,
-    startTime: number
-  }, (error) => {
-    if (error) {
-      console.warn(`error updating FB`);
-    } else {
-      console.log(`success updating isActive`);
-    }
-  });
+function updateIsActive(bool, string, number, id) {
+  if (id !== '') {
+    db.ref(`accounts/${id}`).set({
+      activeUser: string,
+      isActive: bool,
+      startTime: number
+    }, (error) => {
+      if (error) {
+        console.warn(`error updating FB`);
+      } else {
+        console.log(`success updating isActive`);
+      }
+    });
+  }
 }
 
-function updateWaitList(array) {
+function updateWaitList(array, waitListKeys) {
   db.ref('waitList').set({
-    waitList: array
+    waitList: array,
+    waitListKeys: waitListKeys
   }, (error) => {
     if (error) {
       console.warn(`error updating FB waitList`);
@@ -278,7 +354,6 @@ function updateWaitList(array) {
 function updateLogs(activeUser, timerString) {
   const dateToday = getCurrentDate();
   const logTime = getSystemTime();
-
   db.ref(`logs/${dateToday}/${activeUser}-${timerString}`).set({
     user: activeUser,
     timeUsed: timerString,
