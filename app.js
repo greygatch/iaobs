@@ -1,16 +1,13 @@
 const config = {
-  apiKey: "AIzaSyAR6ITxJ5W0KPi4khecgpZQV8dFc0tfjjM",
-  authDomain: "randomtestbed.firebaseapp.com",
-  databaseURL: "https://randomtestbed.firebaseio.com",
-  projectId: "randomtestbed",
-  storageBucket: "randomtestbed.appspot.com",
-  messagingSenderId: "274147985197",
-  appId: "1:274147985197:web:7acaff8b54cf0bfc"
+  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
+  authDomain: "iaobs-3941b.firebaseapp.com",
+  databaseURL: "https://iaobs-3941b.firebaseio.com",
+  projectId: "iaobs-3941b",
+  storageBucket: "iaobs-3941b.appspot.com",
+  messagingSenderId: "981123119987"
 };
 
 firebase.initializeApp(config);
-
-// TODO: Create account specific wait-lists
 
 const db = firebase.database();
 const stopButton = document.getElementsByClassName('stop-button');
@@ -303,7 +300,7 @@ function createList (array) {
       button.id = 'delete-email-button'
       const listItem = document.createElement('li');
       listItem.appendChild(button);
-      listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]}`));
+      listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]} for ${waitListKeys[i]}'s account`));
       list.appendChild(listItem);
     }
     waitListUI.appendChild(list);
