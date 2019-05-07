@@ -19,13 +19,12 @@ const waitListUI = document.getElementById('wait-list');
 const addEmailButton = document.getElementById('add-user-email');
 const emailInstructions = document.getElementById('email-instructions');
 const appInstructions = document.getElementById('app-instructions');
-const appInstructionText = `Enter your name to reserve this account!`;
-const emailInstructionText = `Enter your email to be notified when BrowserStack becomes available!`;
 
 let waitList;
 let waitListKeys;
 let timerStartValue = {};
 let dbValues;
+let intervalObject = {};
 
 /* <<------------------ Event Handler Setup ------------------>> */
 
@@ -115,6 +114,7 @@ function stopUsingBrowserStack(stopButton) {
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
   delete timerStartValue[key]
 
+  clearInterval(intervalObject[key]);
   updateLogs(activeUser, formattedString);
   updateIsActive(false, ``, 0, key);
 }
@@ -126,13 +126,15 @@ function addToWaitList() {
   let accountInputError = '';
   let emailError = '';
 
+  // Checks for email legitimacy & accountInput has a value. If both fail, show both error messages.
   if (emailInput.match(emailRegex) && accountInput.value) {
+    // Checks if email already exists in the que. If fails show error state.
     if (waitList.indexOf(emailInput) === -1) {
       waitList.push(userEmailInput.value);
       waitListKeys.push(accountInput.value)
       userEmailInput.value = '';
       accountInput.value = '';
-      emailInstructions.innerHTML = emailInstructionText;
+      emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
       emailInstructions.style.color = '';
       updateWaitList(waitList, waitListKeys);
       createList(waitList);
@@ -152,6 +154,7 @@ function addToWaitList() {
   }
 }
 
+// Removes the selected email from dom lists and saves to DB.
 function deleteFromWaitList() {
   waitList.splice(this.value, 1);
   waitListKeys.splice(this.value, 1);
@@ -169,6 +172,7 @@ function setActive(key) {
   const activeUser = dbValues[key].activeUser;
   let accountName = key.split('');
 
+  // Sets first letter to Uppercase. Might find a better solution in css.
   accountName.splice(0, 1, accountName[0].toUpperCase())
   accountName = accountName.join('');
   startTime = dbValues[key].startTime
@@ -195,7 +199,7 @@ function setInActive(key) {
     activeDiv.innerHTML = `${key}'s BrowserStack account is available!`;
     activeTimer.innerHTML = ``;
     activeTimer.style.height = '';
-    appInstructions.innerHTML = appInstructionText;
+    appInstructions.innerHTML = `Enter your name to reserve this account!`;
     stopButton.disabled = true;
     useButton.disabled = false;
     userNameInput.disabled = false;
@@ -205,6 +209,8 @@ function setInActive(key) {
 // Init the timer and set the starting value.
 function startTimer(startNumber, key) {
   const initTimer = getSystemTime();
+
+  // If the key does not exist on timerStartValue then create it.
   if (!timerStartValue[key]) {
     timerStartValue[key] = {
       isActive: false,
@@ -215,13 +221,15 @@ function startTimer(startNumber, key) {
   // If the timer has already been started do not call incrementTimer again
   if (dbValues[key].isActive && !timerStartValue[key].isActive) {
     timerStartValue[key].isActive = true;
-    setInterval(incrementTimer, 1000, key);
+    // Sets the interval to an object bound by the key. We need this later to clear the interval.
+    intervalObject[key] = setInterval(incrementTimer, 1000, key);
   }
 }
 
 // Add 1 every second to the timer value & display.
 function incrementTimer(key) {
   const activeTimer = document.getElementById(`active-timer ${key}`);
+
   if (timerStartValue[key]) {
     ++timerStartValue[key].value;
     activeTimer.innerHTML = formatTimer(timerStartValue[key].value);
@@ -230,14 +238,14 @@ function incrementTimer(key) {
 
 // Format timer to human readable string.
 function formatTimer(time) {
+  const stringStart = `For&nbsp;`;
+
   let seconds;
   let hours;
   let minutes;
   let stringMinutes = ``;
   let stringHours = ``;
   let stringSeconds = `&nbsp;seconds`;
-
-  const stringStart = `For&nbsp;`;
 
   if (time > 7200) {
     seconds = time % 60;
@@ -274,6 +282,7 @@ function formatTimer(time) {
 // Return human readable date string.
 function getCurrentDate() {
   const date = new Date();
+
   let day = date.getDate();
   let month = date.getMonth()+1;
   let year = date.getFullYear();
@@ -288,23 +297,27 @@ function getSystemTime() {
   return Date.now();
 }
 
-// Adds List Items to DOM with delete buttons. Rewrites after update.
+// Draws List Items to DOM with delete buttons. Rewrites after DB update to wait-list.
 function createList (array) {
-  let list = document.createElement('ul');
+  const list = document.createElement('ul');
+
   if (array) {
     for (var i = 0; i < array.length; i++) {
       const button = document.createElement('button');
+
       button.addEventListener('click', deleteFromWaitList);
       button.innerHTML = 'Delete';
       button.value = i;
       button.id = 'delete-email-button'
       const listItem = document.createElement('li');
+
       listItem.appendChild(button);
       listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]} for ${waitListKeys[i]}'s account`));
       list.appendChild(listItem);
     }
     waitListUI.appendChild(list);
   
+    // Needed? TODO: Remove?
     if (waitListUI.children.length != 1) {
       waitListUI.firstChild.remove();
     }
