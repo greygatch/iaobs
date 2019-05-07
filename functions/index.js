@@ -51,7 +51,7 @@ exports.activeUserChanged = functions.database.ref('/accounts')
 function sendReminderEmail (waitListArray, waitListKeys, beforeName, startTime, changedAccount) {
   const upperCaseWaitListKeys = [];
   waitListKeys.forEach((key) => {upperCaseWaitListKeys.push(key.toUpperCase())})
-  const indexOfChangedAccountEmail =  upperCaseWaitListKeys.indexOf(accountName.toUpperCase());
+  const indexOfChangedAccountEmail =  upperCaseWaitListKeys.indexOf(changedAccount.toUpperCase());
   const email = waitListArray[indexOfChangedAccountEmail];
   const mailOptions = {
     from: `${APP_NAME} <browserstackautobot@gmail.com>`,
