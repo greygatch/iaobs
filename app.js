@@ -10,15 +10,15 @@ const config = {
 firebase.initializeApp(config);
 
 const db = firebase.database();
-const stopButton = document.getElementsByClassName('stop-button');
-const useButton = document.getElementsByClassName('use-button');
-const userEmailInput = document.getElementById('user-email');
-const accountInput = document.getElementById('account-select');
-const userNameInput = document.getElementsByClassName('user-name-input');
-const waitListUI = document.getElementById('wait-list');
-const addEmailButton = document.getElementById('add-user-email');
-const emailInstructions = document.getElementById('email-instructions');
-const appInstructions = document.getElementById('app-instructions');
+const stopButton = document.getElementsByClassName(`stop-button`);
+const useButton = document.getElementsByClassName(`use-button`);
+const userEmailInput = document.getElementById(`user-email`);
+const accountInput = document.getElementById(`account-select`);
+const userNameInput = document.getElementsByClassName(`user-name-input`);
+const waitListUI = document.getElementById(`wait-list`);
+const addEmailButton = document.getElementById(`add-user-email`);
+const emailInstructions = document.getElementById(`email-instructions`);
+const appInstructions = document.getElementById(`app-instructions`);
 
 let waitList;
 let waitListKeys;
@@ -29,38 +29,38 @@ let intervalObject = {};
 /* <<------------------ Event Handler Setup ------------------>> */
 
 for(let i = 0; i < stopButton.length; i++) {
-  stopButton[i].addEventListener('click', () => {stopUsingBrowserStack(stopButton[i])});
+  stopButton[i].addEventListener(`click`, () => {stopUsingBrowserStack(stopButton[i])});
 }
 
 for(let i = 0; i < useButton.length; i++) {
-  useButton[i].addEventListener('click', () => {beginUsingBrowserStack(useButton[i])});
+  useButton[i].addEventListener(`click`, () => {beginUsingBrowserStack(useButton[i])});
 }
 
 for(let i = 0; i < userNameInput.length; i++) {
-  userNameInput[i].addEventListener('keyup', (event) => {
+  userNameInput[i].addEventListener(`keyup`, (event) => {
     if (event.keyCode === 13) {
       beginUsingBrowserStack(userNameInput[i]);
     }
   })
 }
 
-userEmailInput.addEventListener('keyup', (event) => {
+userEmailInput.addEventListener(`keyup`, (event) => {
   if (event.keyCode === 13) {
     addToWaitList();
   }
 });
 
 document.onreadystatechange = () => {
-  if (document.readyState === 'complete') {
+  if (document.readyState === `complete`) {
     init();
   }
 }
 
-addEmailButton.addEventListener('click', addToWaitList);
+addEmailButton.addEventListener(`click`, addToWaitList);
 
 /* <<------------------ Init Fires on FB Update ------------------>> */
 function init() {
-  db.ref(`accounts`).on('value', snap => {
+  db.ref(`accounts`).on(`value`, snap => {
     const accountKeys = Object.keys({...snap.val()});
     dbValues = snap.val();
     if (snap.val()) {
@@ -78,7 +78,7 @@ function init() {
     }
   });
 
-  db.ref('waitList').on('value', snap => {
+  db.ref(`waitList`).on(`value`, snap => {
     if (snap.val()) {
       waitList = snap.val().waitList;
       waitListKeys = snap.val().waitListKeys;
@@ -93,22 +93,22 @@ function init() {
 
 /* <<------------------ User Actions ------------------>> */
 function beginUsingBrowserStack(useButton) {
-  const key = useButton.id.split(' ')[1];
+  const key = useButton.id.split(` `)[1];
   startTime = getSystemTime();
   const userNameInput = document.getElementById(`user-name ${key}`).value;
   const appInstructions = document.getElementById(`app-instructions ${key}`);
 
   if (userNameInput === ``) {
     appInstructions.innerHTML = `Please enter a name!`;
-    appInstructions.style.color = 'firebrick'
+    appInstructions.style.color = `firebrick`
   } else {
-    appInstructions.style.color = ''
+    appInstructions.style.color = ``
     updateIsActive(true, userNameInput, startTime, key);
   }
 }
 
 function stopUsingBrowserStack(stopButton) {
-  const key = stopButton.id.split(' ')[1];
+  const key = stopButton.id.split(` `)[1];
   const activeTimer = document.getElementById(`active-timer ${key}`);
   const activeUser = dbValues[key].activeUser;
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
@@ -122,8 +122,8 @@ function addToWaitList() {
   const emailInput = userEmailInput.value;
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/g;
 
-  let accountInputError = '';
-  let emailError = '';
+  let accountInputError = ``;
+  let emailError = ``;
 
   // Checks for email legitimacy & accountInput has a value. If both fail, show both error messages.
   if (emailInput.match(emailRegex) && accountInput.value) {
@@ -134,12 +134,11 @@ function addToWaitList() {
       userEmailInput.value = ``;
       accountInput.value = ``;
       emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
-      emailInstructions.style.color = '';
+      emailInstructions.style.color = ``;
       updateWaitList(waitList, waitListKeys);
-      createList(waitList);
     } else {
       emailInstructions.innerHTML = `This email is already in the wait list!`;
-      emailInstructions.style.color = 'firebrick';
+      emailInstructions.style.color = `firebrick`;
     }
   } else {
     if (!accountInput.value) {
@@ -149,7 +148,7 @@ function addToWaitList() {
       emailError = `Please enter a valid email!`;
     }
     emailInstructions.innerHTML = `${emailError} ${accountInputError}`;
-    emailInstructions.style.color = 'firebrick';
+    emailInstructions.style.color = `firebrick`;
   }
 }
 
@@ -161,6 +160,8 @@ function deleteFromWaitList() {
 }
 
 /* <<------------------ App Functions ------------------>> */
+// Updates to the DOM should happen in setActive & setInActive to propagate changes for all users.
+// Runs each time init is called from the DB updating accounts path for each active tracker.
 function setActive(key) {
   const activeDiv = document.getElementById(`active-status ${key}`);
   const stopButton = document.getElementById(`stop-button ${key}`);
@@ -169,23 +170,25 @@ function setActive(key) {
   const userNameInput = document.getElementById(`user-name ${key}`);
   const appInstructions = document.getElementById(`app-instructions ${key}`);
   const activeUser = dbValues[key].activeUser;
-  let accountName = key.split('');
+  let accountName = key.split(``);
 
   // Sets first letter to Uppercase. Might find a better solution in css.
   accountName.splice(0, 1, accountName[0].toUpperCase())
-  accountName = accountName.join('');
+  accountName = accountName.join(``);
   startTime = dbValues[key].startTime
 
   activeDiv.innerHTML = `${activeUser} is using ${accountName}'s BrowserStack account`;
-  activeTimer.style.height = '15px';
-  userNameInput.disabled = true;
-  userNameInput.value = ``;
+  // Sets height to prevent jumping boxes.
+  activeTimer.style.height = `15px`;
+  appInstructions.innerHTML = ``;
   stopButton.disabled = false;
   useButton.disabled = true;
-  appInstructions.innerHTML = ``;
+  userNameInput.disabled = true;
+  userNameInput.value = ``;
   startTimer(startTime, key);
 }
 
+// Runs each time init is called from the DB updating accounts path for each inactive tracker.
 function setInActive(key) {
   if (key !== undefined) {
     const stopButton = document.getElementById(`stop-button ${key}`);
@@ -195,14 +198,16 @@ function setInActive(key) {
     const userNameInput = document.getElementById(`user-name ${key}`);
     const appInstructions = document.getElementById(`app-instructions ${key}`);
 
-    clearInterval(intervalObject[key]);
     activeDiv.innerHTML = `${key}'s BrowserStack account is available!`;
-    activeTimer.innerHTML = ``;
+    // Sets height to prevent jumping boxes.
     activeTimer.style.height = ``;
+    activeTimer.innerHTML = ``;
     appInstructions.innerHTML = `Enter your name to reserve this account!`;
     stopButton.disabled = true;
     useButton.disabled = false;
     userNameInput.disabled = false;
+    // Clears interval from the active tracker based on unique ID.
+    clearInterval(intervalObject[key]);
   }
 }
 
@@ -299,25 +304,26 @@ function getSystemTime() {
 
 // Draws List Items to DOM with delete buttons. Rewrites after DB update to wait-list.
 function createList (array) {
-  const list = document.createElement('ul');
+  const list = document.createElement(`ul`);
 
   if (array) {
     for (var i = 0; i < array.length; i++) {
-      const button = document.createElement('button');
+      const button = document.createElement(`button`);
 
-      button.addEventListener('click', deleteFromWaitList);
+      button.addEventListener(`click`, deleteFromWaitList);
       button.innerHTML = `Delete`;
       button.value = i;
-      button.id = 'delete-email-button'
-      const listItem = document.createElement('li');
+      button.id = `delete-email-button`
+
+      const listItem = document.createElement(`li`);
 
       listItem.appendChild(button);
       listItem.appendChild(document.createTextNode(`${i+1}. ${array[i]} for ${waitListKeys[i]}'s account`));
       list.appendChild(listItem);
     }
     waitListUI.appendChild(list);
-  
-    // Needed? TODO: Remove?
+
+    // Clears old waitList when createList is called by FB with an updated list.
     if (waitListUI.children.length !== 1) {
       waitListUI.firstChild.remove();
     }
@@ -326,14 +332,14 @@ function createList (array) {
 
 /* <<------------------ Calls to Firebase ------------------>> */
 function updateIsActive(bool, string, number, id) {
-  if (id !== '') {
+  if (id !== ``) {
     db.ref(`accounts/${id}`).set({
       activeUser: string,
       isActive: bool,
       startTime: number
     }, (error) => {
       if (error) {
-        console.warn(`error updating FB`);
+        console.warn(`error updating FB accounts`);
       } else {
         console.log(`success updating isActive`);
       }
@@ -342,7 +348,7 @@ function updateIsActive(bool, string, number, id) {
 }
 
 function updateWaitList(array, waitListKeys) {
-  db.ref('waitList').set({
+  db.ref(`waitList`).set({
     waitList: array,
     waitListKeys: waitListKeys
   }, (error) => {
@@ -356,14 +362,14 @@ function updateWaitList(array, waitListKeys) {
 
 function updateLogs(activeUser, timerString) {
   const dateToday = getCurrentDate();
-  const logTime = getSystemTime();
+  const loggedTime = getSystemTime();
   db.ref(`logs/${dateToday}/${activeUser}-${timerString}`).set({
     user: activeUser,
     timeUsed: timerString,
-    logRecoredTime: logTime
+    loggedTime: loggedTime
   }, (error) => {
     if (error) {
-      console.warn(`error writing to FB`);
+      console.warn(`error writing to FB logs`);
     } else {
       console.log(`success writing to logs`);
     }
