@@ -7,6 +7,7 @@ To track the use of our Browserstack accounts to assist our team members.
 This is a static javascript app that requires no framework or setup. Simply open the index.html in your browser.
 To avoid interruption of service please create your own firebase app and enable the realtime database in test mode.
 More Reading: [Realtime Database Docs](https://firebase.google.com/docs/database/)
+- Create your own firebase app and enable the realtime database in test mode using the [Firebase Console](https://console.firebase.google.com)
 - Create a new app in your firebase project found at console.firebase.google.com/project{YOURFIREBASEPROJECT}/overview and copy the supplied config to app.js config variable.
 - Development on our firebase cloud functions can be depolyed to any firebase app with Realtime Database enabled. You will need node 6 or 8, and the Firebase CLI
 More Reading: [Getting started with Cloud Functions](https://firebase.google.com/docs/functions/get-started)
