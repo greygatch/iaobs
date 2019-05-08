@@ -2,10 +2,6 @@
   display: none;
 }
 
-h3::first-letter {
-  text-transform: uppercase;
-}
-
 body {
   padding: 3em 0 0 0;
   background: Cornsilk;
@@ -13,14 +9,35 @@ body {
   text-align: center;
 }
 
-li {
-  display: inherit;
-  padding: 0.2em 0 0.2em 2em;
-  text-align: left;
+h2 {
+  text-decoration: underline;
 }
 
-.actionBar {
-  margin: 1em 0 0 0;
+h3::first-letter {
+  text-transform: uppercase;
+}
+
+li {
+  display: inherit;
+  margin: 0.5em 0.5em 0.5em 0.5em;
+  text-align: left;
+  font-size: 12px;
+}
+
+li:nth-of-type(odd) {
+  background: BurlyWood;
+}
+
+select, input {
+  background: Cornsilk;
+}
+
+ul {
+  padding-inline-end: 40px;
+}
+
+.browserstack-action-bar {
+  width: 100%;
 }
 
 .button {
@@ -30,35 +47,48 @@ li {
   background-color: chartreuse;
 }
 
-.section {
-  padding: 1em 0 3em 0;
+.stop-button {
+  background-color: IndianRed;
+ }
+
+.tracker {
+  background: NavajoWhite;
+  border: 1px solid black;
+  padding: 0em 1em 1em 1em;
   display: flex;
+  width: 17em;
+  margin: 0.5em 0 0 0;
 }
 
-.waitList {
-  padding: 0 25% 0 25%;
-  width: 50%;
+.wait-list-wrapper {
+  display: flex;
+  justify-content: space-around;
+}
+
+.wait-list {
+  min-height: 9.5em;
+  margin: 1em 0 0 0;
+  width: 100%;
+  max-width: 33em;
+  background: NavajoWhite;
+  border: 1px solid black;
 }
 
 #delete-email-button {
-  margin: 0 5em 0 0;
   background-color: IndianRed;
   float: right;
-}
-
-#stop-button {
- background-color: IndianRed;
+  margin: -2px 0 0px 0;
 }
 
 #tracker-wrapper {
   display: flex;
   justify-content: space-around;
+  padding: 2em 0 0 0;
+  flex-flow: row wrap;
+  margin: auto;
+  max-width: 1000px;
 }
 
 #user-email {
-  width: 30%;
-}
-
-#user-name {
-  text-align: center;
+  width: 14em;
 }

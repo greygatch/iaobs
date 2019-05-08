@@ -10,13 +10,13 @@
 <body>
   <h2>Change's BrowserStack Tracker</h2>
   <div id='tracker-wrapper'>
-    <div class='section'> 
-      <div class='browserstackActionBar'>
-        <div class='statusBar'>
+    <div class='tracker'> 
+      <div class='browserstack-action-bar'>
+        <div class='status-bar'>
           <h3 id='active-status qa'>Loading...</h3>
           <h4 id='active-timer qa'></h4>
         </div>
-        <div class='actionBar'>
+        <div class='action-bar'>
           <h6 id='app-instructions qa'>Loading...</h6>
           <input 
                 name='given-name'
@@ -30,13 +30,13 @@
         </div>
       </div>
     </div>
-    <div class='section'> 
-      <div class='browserstackActionBar'>
-        <div class='statusBar'>
+    <div class='tracker'> 
+      <div class='browserstack-action-bar'>
+        <div class='status-bar'>
           <h3 id='active-status evan'>Loading...</h3>
           <h4 id='active-timer evan'></h4>
         </div>
-        <div class='actionBar'>
+        <div class='action-bar'>
           <h6 id='app-instructions evan'>Loading...</h6>
           <input
                 name='given-name'
@@ -50,13 +50,13 @@
         </div>
       </div>
     </div>
-    <div class='section'> 
-      <div class='browserstackActionBar'>
-        <div class='statusBar'>
+    <div class='tracker'> 
+      <div class='browserstack-action-bar'>
+        <div class='status-bar'>
           <h3 id='active-status justin'>Loading...</h3>
           <h4 id='active-timer justin'></h4>
         </div>
-        <div class='actionBar'>
+        <div class='action-bar'>
           <h6 id='app-instructions justin'>Loading...</h6>
           <input
                 name='given-name'
@@ -71,18 +71,20 @@
       </div>
     </div>
   </div>
-  <div class='waitList'>
-    <h3>waitlist!</h3>
-    <h6 id='email-instructions'>Enter your email to be notified when BrowserStack becomes available!</h6>
-    <input name='email' id='user-email' placeholder='Enter your email here'>
-    <select id='account-select'>
-      <option value=''>--Please choose an account--</option>
-      <option value='QA'>QA</option>
-      <option value='Evan'>Evan</option>
-      <option value='Justin'>Justin</option>
-    </select>
-    <button class='button' id='add-user-email'>Add</button>
-    <div id='wait-list'></div>
+  <div class='wait-list-wrapper'>
+    <div class='wait-list'>
+      <h3>waitlist!</h3>
+      <h6 id='email-instructions'>Enter your email to be notified when BrowserStack becomes available!</h6>
+      <input name='email' id='user-email' placeholder='Enter your email here'>
+      <select id='account-select'>
+        <option value=''>--Please choose an account--</option>
+        <option value='QA'>QA</option>
+        <option value='Evan'>Evan</option>
+        <option value='Justin'>Justin</option>
+      </select>
+      <button class='button' id='add-user-email'>Add</button>
+      <div id='wait-list'></div>
+    </div>
   </div>
   <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.5.4/firebase-database.js"></script>
