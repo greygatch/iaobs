@@ -59,6 +59,8 @@ document.onreadystatechange = () => {
 addEmailButton.addEventListener(`click`, addToWaitList);
 
 /* <<------------------ Init Fires on FB Update ------------------>> */
+// Fires on start & each time FB updates one of the watched paths.
+// If no data exists set default values in DB. 
 function init() {
   db.ref(`accounts`).on(`value`, snap => {
     const accountKeys = Object.keys({...snap.val()});
@@ -94,9 +96,10 @@ function init() {
 /* <<------------------ User Actions ------------------>> */
 function beginUsingBrowserStack(useButton) {
   const key = useButton.id.split(` `)[1];
-  startTime = getSystemTime();
-  const userNameInput = document.getElementById(`user-name ${key}`).value;
   const appInstructions = document.getElementById(`app-instructions ${key}`);
+  const userNameInput = document.getElementById(`user-name ${key}`).value;
+
+  startTime = getSystemTime();
 
   if (userNameInput === ``) {
     appInstructions.innerHTML = `Please enter a name!`;
@@ -112,8 +115,8 @@ function stopUsingBrowserStack(stopButton) {
   const activeTimer = document.getElementById(`active-timer ${key}`);
   const activeUser = dbValues[key].activeUser;
   const formattedString = activeTimer.innerHTML.replace(/&nbsp;/g, ` `);
-  delete timerStartValue[key]
 
+  delete timerStartValue[key];
   updateLogs(activeUser, formattedString);
   updateIsActive(false, ``, 0, key);
 }
@@ -130,7 +133,7 @@ function addToWaitList() {
     // Checks if email already exists in the que. If fails show error state.
     if (waitList.indexOf(emailInput) === -1) {
       waitList.push(userEmailInput.value);
-      waitListKeys.push(accountInput.value)
+      waitListKeys.push(accountInput.value);
       userEmailInput.value = ``;
       accountInput.value = ``;
       emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
@@ -142,7 +145,7 @@ function addToWaitList() {
     }
   } else {
     if (!accountInput.value) {
-      accountInputError = `Please choose an account to wait for!`
+      accountInputError = `Please choose an account to wait for!`;
     }
     if (!emailInput.match(emailRegex)) {
       emailError = `Please enter a valid email!`;
@@ -164,12 +167,13 @@ function deleteFromWaitList() {
 // Runs each time init is called from the DB updating accounts path for each active tracker.
 function setActive(key) {
   const activeDiv = document.getElementById(`active-status ${key}`);
+  const activeTimer = document.getElementById(`active-timer ${key}`);
+  const activeUser = dbValues[key].activeUser;
+  const appInstructions = document.getElementById(`app-instructions ${key}`);
   const stopButton = document.getElementById(`stop-button ${key}`);
   const useButton = document.getElementById(`use-button ${key}`);
-  const activeTimer = document.getElementById(`active-timer ${key}`);
   const userNameInput = document.getElementById(`user-name ${key}`);
-  const appInstructions = document.getElementById(`app-instructions ${key}`);
-  const activeUser = dbValues[key].activeUser;
+
   let accountName = key.split(``);
 
   // Sets first letter to Uppercase. Might find a better solution in css.
@@ -191,12 +195,12 @@ function setActive(key) {
 // Runs each time init is called from the DB updating accounts path for each inactive tracker.
 function setInActive(key) {
   if (key !== undefined) {
-    const stopButton = document.getElementById(`stop-button ${key}`);
-    const useButton = document.getElementById(`use-button ${key}`);
     const activeDiv = document.getElementById(`active-status ${key}`);
     const activeTimer = document.getElementById(`active-timer ${key}`);
-    const userNameInput = document.getElementById(`user-name ${key}`);
     const appInstructions = document.getElementById(`app-instructions ${key}`);
+    const stopButton = document.getElementById(`stop-button ${key}`);
+    const useButton = document.getElementById(`use-button ${key}`);
+    const userNameInput = document.getElementById(`user-name ${key}`);
 
     activeDiv.innerHTML = `${key}'s BrowserStack account is available!`;
     // Sets height to prevent jumping boxes.
@@ -212,14 +216,14 @@ function setInActive(key) {
 }
 
 // Init the timer and set the starting value.
-function startTimer(startNumber, key) {
-  const initTimer = getSystemTime();
+function startTimer(startTime, key) {
+  const initTime = getSystemTime();
 
   // If the key does not exist on timerStartValue then create it.
   if (!timerStartValue[key]) {
     timerStartValue[key] = {
       isActive: false,
-      value: Math.floor((initTimer - startNumber)/1000)
+      value: Math.floor((initTime - startTime)/1000)
     }
   }
 
@@ -246,11 +250,11 @@ function formatTimer(time) {
   const stringStart = `For&nbsp;`;
 
   let seconds;
-  let hours;
   let minutes;
+  let hours;
+  let stringSeconds = `&nbsp;seconds`;
   let stringMinutes = ``;
   let stringHours = ``;
-  let stringSeconds = `&nbsp;seconds`;
 
   if (time > 7200) {
     seconds = time % 60;
@@ -311,9 +315,9 @@ function createList (array) {
       const button = document.createElement(`button`);
 
       button.addEventListener(`click`, deleteFromWaitList);
+      button.id = `delete-email-button`
       button.innerHTML = `Delete`;
       button.value = i;
-      button.id = `delete-email-button`
 
       const listItem = document.createElement(`li`);
 

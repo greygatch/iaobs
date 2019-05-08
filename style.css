@@ -17,10 +17,6 @@ h3::first-letter {
   text-transform: uppercase;
 }
 
-input {
-  background: Cornsilk;
-}
-
 li {
   display: inherit;
   margin: 0.5em 0.5em 0.5em 0.5em;
@@ -32,7 +28,7 @@ li:nth-of-type(odd) {
   background: BurlyWood;
 }
 
-select {
+select, input {
   background: Cornsilk;
 }
 
@@ -89,6 +85,9 @@ ul {
   justify-content: space-around;
   padding: 2em 0 0 0;
   flex-flow: row wrap;
+  margin: auto;
+  width: 100%;
+  max-width: 1000px;
 }
 
 #user-email {
