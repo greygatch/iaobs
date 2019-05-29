@@ -9,12 +9,23 @@ body {
   text-align: center;
 }
 
+button {
+  width: 125px;
+  height: 20px;
+  cursor: pointer;
+  background-color: chartreuse;
+}
+
 h2 {
   text-decoration: underline;
 }
 
 h3::first-letter {
   text-transform: uppercase;
+}
+
+h4 {
+  word-break: break-word;
 }
 
 li {
@@ -40,13 +51,6 @@ ul {
   width: 100%;
 }
 
-.button {
-  width: 125px;
-  height: 20px;
-  cursor: pointer;
-  background-color: chartreuse;
-}
-
 .stop-button {
   background-color: IndianRed;
  }
@@ -60,18 +64,18 @@ ul {
   margin: 0.5em 0 0 0;
 }
 
-.wait-list-wrapper {
-  display: flex;
-  justify-content: space-around;
-}
-
-.wait-list {
+.wait-list-actions {
   min-height: 9.5em;
   margin: 1em 0 0 0;
   width: 100%;
   max-width: 33em;
   background: NavajoWhite;
   border: 1px solid black;
+}
+
+.wait-list-wrapper {
+  display: flex;
+  justify-content: space-around;
 }
 
 #delete-email-button {

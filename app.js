@@ -20,6 +20,18 @@ const addEmailButton = document.getElementById(`add-user-email`);
 const emailInstructions = document.getElementById(`email-instructions`);
 const appInstructions = document.getElementById(`app-instructions`);
 
+// Text declarations
+const acctErrText = `Please choose an account to wait for!`;
+const deleteText = `Delete`;
+const dupeEmailErrText = `This email is already in the wait list!`;
+const emailErrText = `Please enter a valid email!`;
+const enterNameText = `Please enter a name!`;
+const enterEmailText = `Enter your email to be notified when BrowserStack becomes available!`;
+const inputDefaultText = `Enter your name to reserve this account!`;
+
+// Color declarations
+const errColor = `firebrick`;
+
 let waitList;
 let waitListKeys;
 let timerStartValue = {};
@@ -102,8 +114,8 @@ function beginUsingBrowserStack(useButton) {
   startTime = getSystemTime();
 
   if (userNameInput === ``) {
-    appInstructions.innerHTML = `Please enter a name!`;
-    appInstructions.style.color = `firebrick`
+    appInstructions.innerHTML = `${enterNameText}`;
+    appInstructions.style.color = `${errColor}`
   } else {
     appInstructions.style.color = ``
     updateIsActive(true, userNameInput, startTime, key);
@@ -136,22 +148,22 @@ function addToWaitList() {
       waitListKeys.push(accountInput.value);
       userEmailInput.value = ``;
       accountInput.value = ``;
-      emailInstructions.innerHTML = `Enter your email to be notified when BrowserStack becomes available!`;
+      emailInstructions.innerHTML = `${enterEmailText}`;
       emailInstructions.style.color = ``;
       updateWaitList(waitList, waitListKeys);
     } else {
-      emailInstructions.innerHTML = `This email is already in the wait list!`;
-      emailInstructions.style.color = `firebrick`;
+      emailInstructions.innerHTML = `${dupeEmailErrText}`;
+      emailInstructions.style.color = `${errColor}`;
     }
   } else {
     if (!accountInput.value) {
-      accountInputError = `Please choose an account to wait for!`;
+      accountInputError = `${acctErrText}`;
     }
     if (!emailInput.match(emailRegex)) {
-      emailError = `Please enter a valid email!`;
+      emailError = `${emailErrText}`;
     }
     emailInstructions.innerHTML = `${emailError} ${accountInputError}`;
-    emailInstructions.style.color = `firebrick`;
+    emailInstructions.style.color = `${errColor}`;
   }
 }
 
@@ -206,7 +218,7 @@ function setInActive(key) {
     // Sets height to prevent jumping boxes.
     activeTimer.style.height = ``;
     activeTimer.innerHTML = ``;
-    appInstructions.innerHTML = `Enter your name to reserve this account!`;
+    appInstructions.innerHTML = `${inputDefaultText}`;
     stopButton.disabled = true;
     useButton.disabled = false;
     userNameInput.disabled = false;
@@ -316,7 +328,7 @@ function createList (array) {
 
       button.addEventListener(`click`, deleteFromWaitList);
       button.id = `delete-email-button`
-      button.innerHTML = `Delete`;
+      button.innerHTML = `${deleteText}`;
       button.value = i;
 
       const listItem = document.createElement(`li`);
