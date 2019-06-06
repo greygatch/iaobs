@@ -1,10 +1,10 @@
 const config = {
-  apiKey: "AIzaSyDKw3mLK-1U5YeE9MccAD761q1Jfcs5pWU",
-  authDomain: "iaobs-3941b.firebaseapp.com",
-  databaseURL: "https://iaobs-3941b.firebaseio.com",
-  projectId: "iaobs-3941b",
-  storageBucket: "iaobs-3941b.appspot.com",
-  messagingSenderId: "981123119987"
+  apiKey: "AIzaSyBtH7s4vDEgqOcdfTc0CGjQ2C07nxhM9hA",
+  authDomain: "browserstackappch.firebaseapp.com",
+  databaseURL: "https://browserstackappch.firebaseio.com",
+  projectId: "browserstackappch",
+  messagingSenderId: "1068441941356",
+  appId: "1:1068441941356:web:f502e11c0892377f"
 };
 
 firebase.initializeApp(config);
